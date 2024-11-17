@@ -15,56 +15,31 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    /** @description Page number */
+                    /** @description Enable pagination. Supplied value used as page number */
                     page?: components["parameters"]["page"];
-                    /** @description Number of items per page */
+                    /** @description Number of records to be returned. */
                     limit?: components["parameters"]["limit"];
-                    /** @description Sort field */
+                    /** @description  You can sort by any property in the objects (strings or numbers) */
                     sort?: components["parameters"]["sort"];
-                    /** @description Sort order */
+                    /** @description You can order by either ascending or descending order */
                     order?: components["parameters"]["order"];
-                    /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array. */
+                    /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array */
                     search?: components["parameters"]["search"];
-                    /** @description Filters by equality */
-                    id_eq?: string;
-                    /** @description Filters by inequality */
-                    id_ne?: string;
-                    /** @description Filters by partial match using * */
-                    id_like?: string;
-                    /** @description Filters properties that start with a value */
-                    id_start?: string;
-                    /** @description Filters properties that end with a value */
-                    id_end?: string;
-                    /** @description Filters by equality */
-                    type_eq?: string;
-                    /** @description Filters by inequality */
-                    type_ne?: string;
-                    /** @description Filters by partial match using * */
-                    type_like?: string;
-                    /** @description Filters properties that start with a value */
-                    type_start?: string;
-                    /** @description Filters properties that end with a value */
-                    type_end?: string;
-                    /** @description Filters by equality */
-                    state_eq?: string;
-                    /** @description Filters by inequality */
-                    state_ne?: string;
-                    /** @description Filters by partial match using * */
-                    state_like?: string;
-                    /** @description Filters properties that start with a value */
-                    state_start?: string;
-                    /** @description Filters properties that end with a value */
-                    state_end?: string;
-                    /** @description Filters by equality */
-                    last_activity_eq?: string;
-                    /** @description Filters by inequality */
-                    last_activity_ne?: string;
-                    /** @description Filters by partial match using * */
-                    last_activity_like?: string;
-                    /** @description Filters properties that start with a value */
-                    last_activity_start?: string;
-                    /** @description Filters properties that end with a value */
-                    last_activity_end?: string;
+                    /** @description """
+                     *     To filter an array, you can use query parameters in the form [property]_[operator]
+                     *     Available operators:
+                     *       eq  	Filters by equality
+                     *       ne  	Filters by inequality
+                     *       gt  	Filters by greater
+                     *       gte 	Filters by greater or equal
+                     *       lt  	Filters by lower
+                     *       lte 	Filters by lower or equal
+                     *       like	Filters by partial match *
+                     *       start	Filters properties that start with a value *
+                     *       end   Filters properties that end with a value *
+                     *     """
+                     *      */
+                    "[propety]_[operation]"?: components["parameters"]["[propety]_[operation]"];
                 };
                 header?: never;
                 path?: never;
@@ -72,17 +47,8 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Collection of automation instances response */
-                200: {
-                    headers: {
-                        "X-Total-Count": components["headers"]["X-Total-Count"];
-                        "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Automation"][];
-                    };
-                };
+                200: components["responses"]["AutomationPageResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
             };
         };
         put?: never;
@@ -113,15 +79,9 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Automation response */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Automation"];
-                    };
-                };
+                200: components["responses"]["AutomationSingleResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
+                404: components["responses"]["EntityNotFoundResponse"];
             };
         };
         put?: never;
@@ -152,17 +112,9 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Collection of automation instance logs */
-                200: {
-                    headers: {
-                        "X-Total-Count": components["headers"]["X-Total-Count"];
-                        "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AutomationLog"][];
-                    };
-                };
+                200: components["responses"]["AutomationLogResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
+                404: components["responses"]["EntityNotFoundResponse"];
             };
         };
         put?: never;
@@ -184,46 +136,31 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    /** @description Page number */
+                    /** @description Enable pagination. Supplied value used as page number */
                     page?: components["parameters"]["page"];
-                    /** @description Number of items per page */
+                    /** @description Number of records to be returned. */
                     limit?: components["parameters"]["limit"];
-                    /** @description Sort field */
+                    /** @description  You can sort by any property in the objects (strings or numbers) */
                     sort?: components["parameters"]["sort"];
-                    /** @description Sort order */
+                    /** @description You can order by either ascending or descending order */
                     order?: components["parameters"]["order"];
-                    /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array. */
+                    /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array */
                     search?: components["parameters"]["search"];
-                    /** @description Filters by equality */
-                    type_eq?: string;
-                    /** @description Filters by inequality */
-                    type_ne?: string;
-                    /** @description Filters by partial match using * */
-                    type_like?: string;
-                    /** @description Filters properties that start with a value */
-                    type_start?: string;
-                    /** @description Filters properties that end with a value */
-                    type_end?: string;
-                    /** @description Filters by equality */
-                    initial_state_eq?: string;
-                    /** @description Filters by inequality */
-                    initial_state_ne?: string;
-                    /** @description Filters by partial match using * */
-                    initial_state_like?: string;
-                    /** @description Filters properties that start with a value */
-                    initial_state_start?: string;
-                    /** @description Filters properties that end with a value */
-                    initial_state_end?: string;
-                    /** @description Filters by equality */
-                    end_state_eq?: string;
-                    /** @description Filters by inequality */
-                    end_state_ne?: string;
-                    /** @description Filters by partial match using * */
-                    end_state_like?: string;
-                    /** @description Filters properties that start with a value */
-                    end_state_start?: string;
-                    /** @description Filters properties that end with a value */
-                    end_state_end?: string;
+                    /** @description """
+                     *     To filter an array, you can use query parameters in the form [property]_[operator]
+                     *     Available operators:
+                     *       eq  	Filters by equality
+                     *       ne  	Filters by inequality
+                     *       gt  	Filters by greater
+                     *       gte 	Filters by greater or equal
+                     *       lt  	Filters by lower
+                     *       lte 	Filters by lower or equal
+                     *       like	Filters by partial match *
+                     *       start	Filters properties that start with a value *
+                     *       end   Filters properties that end with a value *
+                     *     """
+                     *      */
+                    "[propety]_[operation]"?: components["parameters"]["[propety]_[operation]"];
                 };
                 header?: never;
                 path?: never;
@@ -231,17 +168,8 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Collection of automation types response */
-                200: {
-                    headers: {
-                        "X-Total-Count": components["headers"]["X-Total-Count"];
-                        "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AutomationType"][];
-                    };
-                };
+                200: components["responses"]["AutomationTypePageResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
             };
         };
         put?: never;
@@ -272,15 +200,9 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Automation type response */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AutomationType"];
-                    };
-                };
+                200: components["responses"]["AutomationTypeSingleResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
+                404: components["responses"]["EntityNotFoundResponse"];
             };
         };
         put?: never;
@@ -308,15 +230,8 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Collection of SAS */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["SAS"][];
-                    };
-                };
+                200: components["responses"]["SASResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
             };
         };
         put?: never;
@@ -338,46 +253,31 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    /** @description Page number */
+                    /** @description Enable pagination. Supplied value used as page number */
                     page?: components["parameters"]["page"];
-                    /** @description Number of items per page */
+                    /** @description Number of records to be returned. */
                     limit?: components["parameters"]["limit"];
-                    /** @description Sort field */
+                    /** @description  You can sort by any property in the objects (strings or numbers) */
                     sort?: components["parameters"]["sort"];
-                    /** @description Sort order */
+                    /** @description You can order by either ascending or descending order */
                     order?: components["parameters"]["order"];
-                    /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array. */
+                    /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array */
                     search?: components["parameters"]["search"];
-                    /** @description Filters by equality */
-                    runner_group_eq?: string;
-                    /** @description Filters by inequality */
-                    runner_group_ne?: string;
-                    /** @description Filters by partial match using * */
-                    runner_group_like?: string;
-                    /** @description Filters properties that start with a value */
-                    runner_group_start?: string;
-                    /** @description Filters properties that end with a value */
-                    runner_group_end?: string;
-                    /** @description Filters by equality */
-                    organization_eq?: string;
-                    /** @description Filters by inequality */
-                    organization_ne?: string;
-                    /** @description Filters by partial match using * */
-                    organization_like?: string;
-                    /** @description Filters properties that start with a value */
-                    organization_start?: string;
-                    /** @description Filters properties that end with a value */
-                    organization_end?: string;
-                    /** @description Filters by equality */
-                    state_eq?: string;
-                    /** @description Filters by inequality */
-                    state_ne?: string;
-                    /** @description Filters by partial match using * */
-                    state_like?: string;
-                    /** @description Filters properties that start with a value */
-                    state_start?: string;
-                    /** @description Filters properties that end with a value */
-                    state_end?: string;
+                    /** @description """
+                     *     To filter an array, you can use query parameters in the form [property]_[operator]
+                     *     Available operators:
+                     *       eq  	Filters by equality
+                     *       ne  	Filters by inequality
+                     *       gt  	Filters by greater
+                     *       gte 	Filters by greater or equal
+                     *       lt  	Filters by lower
+                     *       lte 	Filters by lower or equal
+                     *       like	Filters by partial match *
+                     *       start	Filters properties that start with a value *
+                     *       end   Filters properties that end with a value *
+                     *     """
+                     *      */
+                    "[propety]_[operation]"?: components["parameters"]["[propety]_[operation]"];
                 };
                 header?: never;
                 path?: never;
@@ -385,17 +285,8 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Collection of automation instances response */
-                200: {
-                    headers: {
-                        "X-Total-Count": components["headers"]["X-Total-Count"];
-                        "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Runner"][];
-                    };
-                };
+                200: components["responses"]["RunnerPageResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
             };
         };
         put?: never;
@@ -419,22 +310,16 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description ID of the runner */
-                    id: string;
+                    /** @description Id of the entity to be returned. */
+                    id: components["parameters"]["id"];
                 };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description Runner response */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Runner"];
-                    };
-                };
+                200: components["responses"]["RunnerSingleResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
+                404: components["responses"]["EntityNotFoundResponse"];
             };
         };
         put?: never;
@@ -456,16 +341,31 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    /** @description Page number */
+                    /** @description Enable pagination. Supplied value used as page number */
                     page?: components["parameters"]["page"];
-                    /** @description Number of items per page */
+                    /** @description Number of records to be returned. */
                     limit?: components["parameters"]["limit"];
-                    /** @description Sort field */
+                    /** @description  You can sort by any property in the objects (strings or numbers) */
                     sort?: components["parameters"]["sort"];
-                    /** @description Sort order */
+                    /** @description You can order by either ascending or descending order */
                     order?: components["parameters"]["order"];
-                    /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array. */
+                    /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array */
                     search?: components["parameters"]["search"];
+                    /** @description """
+                     *     To filter an array, you can use query parameters in the form [property]_[operator]
+                     *     Available operators:
+                     *       eq  	Filters by equality
+                     *       ne  	Filters by inequality
+                     *       gt  	Filters by greater
+                     *       gte 	Filters by greater or equal
+                     *       lt  	Filters by lower
+                     *       lte 	Filters by lower or equal
+                     *       like	Filters by partial match *
+                     *       start	Filters properties that start with a value *
+                     *       end   Filters properties that end with a value *
+                     *     """
+                     *      */
+                    "[propety]_[operation]"?: components["parameters"]["[propety]_[operation]"];
                 };
                 header?: never;
                 path?: never;
@@ -473,17 +373,8 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Collection of automation instances response */
-                200: {
-                    headers: {
-                        "X-Total-Count": components["headers"]["X-Total-Count"];
-                        "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Job"][];
-                    };
-                };
+                200: components["responses"]["JobPageResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
             };
         };
         put?: never;
@@ -501,28 +392,22 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Get jobs */
+        /** @description Get job */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description ID of the job */
-                    id: string;
+                    /** @description Id of the entity to be returned. */
+                    id: components["parameters"]["id"];
                 };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description Job response */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Job"];
-                    };
-                };
+                200: components["responses"]["JobSingleResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
+                404: components["responses"]["EntityNotFoundResponse"];
             };
         };
         put?: never;
@@ -544,15 +429,15 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    /** @description Page number */
+                    /** @description Enable pagination. Supplied value used as page number */
                     page?: components["parameters"]["page"];
-                    /** @description Number of items per page */
+                    /** @description Number of records to be returned. */
                     limit?: components["parameters"]["limit"];
-                    /** @description Sort field */
+                    /** @description  You can sort by any property in the objects (strings or numbers) */
                     sort?: components["parameters"]["sort"];
-                    /** @description Sort order */
+                    /** @description You can order by either ascending or descending order */
                     order?: components["parameters"]["order"];
-                    /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array. */
+                    /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array */
                     search?: components["parameters"]["search"];
                 };
                 header?: never;
@@ -561,17 +446,8 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Collection of automation instances response */
-                200: {
-                    headers: {
-                        "X-Total-Count": components["headers"]["X-Total-Count"];
-                        "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["MetricWithRunner"][];
-                    };
-                };
+                200: components["responses"]["MetricsPageResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
             };
         };
         put?: never;
@@ -582,7 +458,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/metrics/{runner}": {
+    "/metrics/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -595,22 +471,16 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description ID of the runner */
-                    runner: string;
+                    /** @description Id of the entity to be returned. */
+                    id: components["parameters"]["id"];
                 };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description Runner response */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["MetricWithRunner"];
-                    };
-                };
+                200: components["responses"]["MetricsSingleResponse"];
+                401: components["responses"]["UnauthorizedResponse"];
+                404: components["responses"]["EntityNotFoundResponse"];
             };
         };
         put?: never;
@@ -661,14 +531,16 @@ export interface components {
         /** @enum {string} */
         RunnerState: "idle" | "active" | "failed" | "offline";
         Runner: {
-            id: string;
-            state: components["schemas"]["RunnerState"];
-            runner_group: string;
-            organization: string;
-        };
-        Job: {
             id?: string;
             state?: components["schemas"]["RunnerState"];
+            runner_group?: string;
+            organization?: string;
+        };
+        /** @enum {string} */
+        JobState: "success" | "failed" | "queued" | "in_progress";
+        Job: {
+            id?: string;
+            state?: components["schemas"]["JobState"];
             organization?: string;
             SAS?: components["schemas"]["SAS"];
             runner?: string;
@@ -686,21 +558,205 @@ export interface components {
         };
         MetricWithRunner: {
             runner?: string;
+            /** @description """
+             *     Array of last N metrics. From the oldest to the newest.
+             *
+             *     1 fixed point in time:
+             *     For offline runners - from unspecified past to the runner termination (equal to the timestamp of the runner's job with success or failed state).
+             *     For idle runners - from unspecified past to the present.
+             *     - steps between metrics are unspecified, choose a reasonable constant.
+             *
+             *     2 fixed points in time:
+             *     For active runners - from the runner start (equal to the timestamp of the runner's job with in_progress state) to the present.
+             *     - steps between metrics should be scaled to the runner activity time window.
+             *     """
+             *      */
             metrics?: components["schemas"]["Metric"][];
         };
+        ErrorResponse: {
+            code: string;
+            error?: string;
+            message: string;
+        };
+        EmptyResponse: {
+            data?: Record<string, never>;
+        };
     };
-    responses: never;
+    responses: {
+        /** @description Automation response */
+        AutomationSingleResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Automation"];
+            };
+        };
+        /** @description Collection of automation instances response */
+        AutomationPageResponse: {
+            headers: {
+                "X-Total-Count": components["headers"]["X-Total-Count"];
+                "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Automation"][];
+            };
+        };
+        /** @description Collection of automation instance logs */
+        AutomationLogResponse: {
+            headers: {
+                "X-Total-Count": components["headers"]["X-Total-Count"];
+                "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AutomationLog"][];
+            };
+        };
+        /** @description Automation type response */
+        AutomationTypeSingleResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AutomationType"];
+            };
+        };
+        /** @description Collection of automation types response */
+        AutomationTypePageResponse: {
+            headers: {
+                "X-Total-Count": components["headers"]["X-Total-Count"];
+                "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["AutomationType"][];
+            };
+        };
+        /** @description Collection of SAS response */
+        SASResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["SAS"][];
+            };
+        };
+        /** @description Single runner pod response */
+        RunnerSingleResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Runner"];
+            };
+        };
+        /** @description Collection of runner pods instances response */
+        RunnerPageResponse: {
+            headers: {
+                "X-Total-Count": components["headers"]["X-Total-Count"];
+                "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Runner"][];
+            };
+        };
+        /** @description Single job response */
+        JobSingleResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Job"];
+            };
+        };
+        /** @description Collection of jobs response */
+        JobPageResponse: {
+            headers: {
+                "X-Total-Count": components["headers"]["X-Total-Count"];
+                "X-Filtered-Count": components["headers"]["X-Filtered-Count"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Job"][];
+            };
+        };
+        /** @description Single metrics response */
+        MetricsSingleResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Metric"];
+            };
+        };
+        /** @description Collection of metrics response */
+        MetricsPageResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Metric"][];
+            };
+        };
+        /** @description An Entity with the specified ID was not found */
+        EntityNotFoundResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["EmptyResponse"];
+            };
+        };
+        /** @description Method not Allowed */
+        MethodNotAllowedResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
+        /** @description Unauthorized */
+        UnauthorizedResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorResponse"];
+            };
+        };
+    };
     parameters: {
-        /** @description Page number */
+        /** @description Id of the entity to be returned. */
+        id: string;
+        /** @description Enable pagination. Supplied value used as page number */
         page: number;
-        /** @description Number of items per page */
+        /** @description Number of records to be returned. */
         limit: number;
-        /** @description Sort field */
+        /** @description  You can sort by any property in the objects (strings or numbers) */
         sort: string;
-        /** @description Sort order */
+        /** @description You can order by either ascending or descending order */
         order: "asc" | "desc";
-        /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array. */
+        /** @description To search an array, you can use the search query parameter. Search is a special kind of filter that will look for a partial match in any values (with nesting) in the array */
         search: string;
+        /** @description """
+         *     To filter an array, you can use query parameters in the form [property]_[operator]
+         *     Available operators:
+         *       eq  	Filters by equality
+         *       ne  	Filters by inequality
+         *       gt  	Filters by greater
+         *       gte 	Filters by greater or equal
+         *       lt  	Filters by lower
+         *       lte 	Filters by lower or equal
+         *       like	Filters by partial match *
+         *       start	Filters properties that start with a value *
+         *       end   Filters properties that end with a value *
+         *     """
+         *      */
+        "[propety]_[operation]": string;
     };
     requestBodies: never;
     headers: {
