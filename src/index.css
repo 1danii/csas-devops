@@ -1,3 +1,92 @@
+@import "@radix-ui/colors/slate.css";
+@import "@radix-ui/colors/slate-alpha.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/Inter-Variable.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --radius: 8px;
+}
+
+:root,
+.light,
+.light-theme {
+  --blue-1: #fafbfd;
+  --blue-2: #f3f7fd;
+  --blue-3: #e8f0fd;
+  --blue-4: #d9e8ff;
+  --blue-5: #c8deff;
+  --blue-6: #b4d1ff;
+  --blue-7: #9bbefa;
+  --blue-8: #78a6f4;
+  --blue-9: #2870ed;
+  --blue-10: #1c62db;
+  --blue-11: #1c63dc;
+  --blue-12: #123065;
+
+  --blue-a1: #3e7efd04;
+  --blue-a2: #1672fd0b;
+  --blue-a3: #0a67fe16;
+  --blue-a4: #d9e8ff;
+  --blue-a5: #c8deff;
+  --blue-a6: #b4d1ff;
+  --blue-a7: #015bf563;
+  --blue-a8: #0259ec87;
+  --blue-a9: #0055ead7;
+  --blue-a10: #004fd7e3;
+  --blue-a11: #0050d8e3;
+  --blue-a12: #002059ed;
+
+  --color-primary: #fdfdfd;
+}
+
+@supports (color: color(display-p3 1 1 1)) {
+  @media (color-gamut: p3) {
+    :root,
+    .light,
+    .light-theme {
+      --blue-1: oklch(98.7% 0.0028 260.7);
+      --blue-2: oklch(97.5% 0.0095 260.7);
+      --blue-3: oklch(95.3% 0.0198 260.7);
+      --blue-4: oklch(92.9% 0.0378 260.7);
+      --blue-5: oklch(89.7% 0.0557 260.7);
+      --blue-6: oklch(85.5% 0.0734 260.7);
+      --blue-7: oklch(79.9% 0.0928 260.7);
+      --blue-8: oklch(72.4% 0.1251 260.7);
+      --blue-9: oklch(57.4% 0.2019 260.7);
+      --blue-10: oklch(53% 0.1974 260.7);
+      --blue-11: oklch(53.1% 0.1974 260.7);
+      --blue-12: oklch(32% 0.1001 260.7);
+
+      --blue-a1: color(display-p3 0.0157 0.3412 0.9961 / 0.012);
+      --blue-a2: color(display-p3 0.0157 0.3412 0.8863 / 0.036);
+      --blue-a3: color(display-p3 0.0118 0.3569 0.9451 / 0.08);
+      --blue-a4: color(display-p3 0.0078 0.3647 0.9922 / 0.131);
+      --blue-a5: color(display-p3 0.0039 0.349 0.9725 / 0.194);
+      --blue-a6: color(display-p3 0.0039 0.3294 0.9647 / 0.265);
+      --blue-a7: color(display-p3 0.0039 0.298 0.9059 / 0.36);
+      --blue-a8: color(display-p3 0.0039 0.2824 0.8706 / 0.487);
+      --blue-a9: color(display-p3 0 0.2549 0.8706 / 0.759);
+      --blue-a10: color(display-p3 0 0.2353 0.7882 / 0.807);
+      --blue-a11: color(display-p3 0 0.2353 0.7922 / 0.803);
+      --blue-a12: color(display-p3 0 0.0902 0.3098 / 0.898);
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-gray-6;
+  }
+  body {
+    @apply bg-primary text-gray-12;
+  }
+}
