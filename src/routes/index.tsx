@@ -5,6 +5,7 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   Table as ReactTable,
   useReactTable,
 } from "@tanstack/react-table";
@@ -34,7 +35,7 @@ function HomeComponent() {
 
 declare module "@tanstack/react-table" {
   //allows us to define custom properties for our columns
-  interface ColumnMeta<TData extends RowData, TValue> {
+  interface ColumnMeta {
     filterOptions?: string[];
   }
 }
@@ -125,15 +126,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ColumnFiltersState } from "@tanstack/react-table";
-import { CheckIcon, ListFilterIcon, SearchIcon, XIcon } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import {
+  CheckIcon,
+  ChevronFirstIcon,
+  ChevronLastIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ListFilterIcon,
+  SearchIcon,
+  XIcon,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 
 export function DataTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 20,
-  });
 
   const query = useMemo(
     () => Object.fromEntries(columnFilters.map((t) => [`${t.id}_eq`, t.value])),
@@ -152,14 +158,18 @@ export function DataTable() {
     data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     manualFiltering: true,
-    manualPagination: true,
     onColumnFiltersChange: setColumnFilters,
     state: {
       columnFilters,
-      pagination,
     },
     debugTable: true,
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   });
 
   return (
@@ -271,30 +281,50 @@ export function DataTable() {
   );
 }
 
-function TablePagination({ table }: { table: ReactTable<unknown> }) {
+function TablePagination<TData>({ table }: { table: ReactTable<TData> }) {
   return (
     <div className="flex items-center justify-end space-x-2 py-4">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => table.previousPage()}
-        disabled={!table.getCanPreviousPage()}
-      >
-        Previous
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => table.nextPage()}
-        disabled={!table.getCanNextPage()}
-      >
-        Next
-      </Button>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-11">
+          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          {table.getPageCount()}
+        </span>
+        <Button
+          variant="outline"
+          onClick={() => table.firstPage()}
+          disabled={table.getState().pagination.pageIndex === 0}
+        >
+          <ChevronFirstIcon />
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          <ChevronLeftIcon /> Previous
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => table.lastPage()}
+          disabled={
+            table.getState().pagination.pageIndex === table.getPageCount() - 1
+          }
+        >
+          <ChevronLastIcon />
+        </Button>
+      </div>
     </div>
   );
 }
 
-function TableFilterMenu({ table }: { table: ReactTable<unknown> }) {
+function TableFilterMenu<TData>({ table }: { table: ReactTable<TData> }) {
   const [open, setOpen] = useState(false);
   const [filterCol, setFilterCol] = useState<string | undefined>(undefined);
 
