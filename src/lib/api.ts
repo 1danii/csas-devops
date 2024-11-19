@@ -6,7 +6,7 @@ import createClient from "openapi-react-query";
 const username = "dopo";
 const password = "DevOps2024";
 
-const fetchClient = createFetchClient<paths>({
+export const fetchClient = createFetchClient<paths>({
   baseUrl: "https://hackaton-api.fly.dev/api/v1",
   headers: {
     Authorization: `Basic ${btoa(username + ":" + password)}`,

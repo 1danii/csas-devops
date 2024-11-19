@@ -5,6 +5,7 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  Table as ReactTable,
   useReactTable,
 } from "@tanstack/react-table";
 import { components } from "schema";
@@ -14,8 +15,6 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-  const { data, isLoading } = api.useQuery("get", "/runners");
-
   return (
     <div className="p-2">
       <h1 className="text-3xl font-semibold">Runners</h1>
@@ -28,16 +27,30 @@ function HomeComponent() {
         <Button size="sm">Continue</Button>
         <Button size="lg">Continue</Button>
       </div>
-      <DataTable columns={columns} data={data} isLoading={isLoading} />
+      <DataTable />
     </div>
   );
 }
 
+declare module "@tanstack/react-table" {
+  //allows us to define custom properties for our columns
+  interface ColumnMeta<TData extends RowData, TValue> {
+    filterOptions?: string[];
+  }
+}
 const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
   {
     accessorKey: "state",
     header: "State",
-    cell: ({ row }) => <div className="bg-green-9 size-3 rounded-full" />,
+    cell: ({ row }) => <div className="size-3 rounded-full bg-green-9" />,
+    meta: {
+      filterOptions: [
+        "active",
+        "failed",
+        "idle",
+        "offline",
+      ] as components["schemas"]["RunnerState"][],
+    },
   },
   {
     accessorKey: "id",
@@ -111,30 +124,76 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CheckIcon, ListFilterIcon, SearchIcon } from "lucide-react";
-import { useState } from "react";
+import { ColumnFiltersState } from "@tanstack/react-table";
+import { CheckIcon, ListFilterIcon, SearchIcon, XIcon } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[] | undefined;
-  isLoading: boolean;
-}
+export function DataTable() {
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 20,
+  });
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  isLoading,
-}: DataTableProps<TData, TValue>) {
+  const query = useMemo(
+    () => Object.fromEntries(columnFilters.map((t) => [`${t.id}_eq`, t.value])),
+    [columnFilters],
+  );
+
+  const { data, isLoading } = api.useQuery("get", "/runners", {
+    params: { query },
+  });
+
+  const tableData = useMemo(() => {
+    return data ?? [];
+  }, [data]);
+
   const table = useReactTable({
-    data: data ?? [],
+    data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    manualFiltering: true,
+    manualPagination: true,
+    onColumnFiltersChange: setColumnFilters,
+    state: {
+      columnFilters,
+      pagination,
+    },
+    debugTable: true,
   });
 
   return (
     <>
       <div className="flex justify-between pb-2">
-        <FilterMenu />
+        <div className="flex gap-2">
+          <TableFilterMenu table={table} />
+          {table.getState().columnFilters.map((filter) => {
+            const column = table.getColumn(filter.id);
+            const value = filter.value as string;
+            return (
+              <div key={filter.id} className="flex items-center gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    column?.setFilterValue(undefined);
+                  }}
+                  key={value}
+                  className="flex items-center gap-1 rounded-md border px-2 py-1"
+                >
+                  <span className="text-gray-11">
+                    {typeof column?.columnDef.header === "string"
+                      ? column.columnDef.header
+                      : filter.id}
+                    :
+                  </span>
+                  <span>{value}</span>
+                  <XIcon />
+                </Button>
+              </div>
+            );
+          })}
+        </div>
         <Button variant="outline">
           <SearchIcon />
           Search
@@ -207,36 +266,47 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      <TablePagination table={table} />
     </>
   );
 }
 
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
-];
+function TablePagination({ table }: { table: ReactTable<unknown> }) {
+  return (
+    <div className="flex items-center justify-end space-x-2 py-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => table.previousPage()}
+        disabled={!table.getCanPreviousPage()}
+      >
+        Previous
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => table.nextPage()}
+        disabled={!table.getCanNextPage()}
+      >
+        Next
+      </Button>
+    </div>
+  );
+}
 
-function FilterMenu() {
+function TableFilterMenu({ table }: { table: ReactTable<unknown> }) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [filterCol, setFilterCol] = useState<string | undefined>(undefined);
+
+  const handleSelect = (value: string) => {
+    const column = table.getColumn(filterCol!);
+    if (column) {
+      column.setFilterValue(value);
+      setOpen(false);
+      setFilterCol(undefined);
+    }
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -245,29 +315,68 @@ function FilterMenu() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandInput placeholder="Search framework..." />
-          <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
-            <CommandGroup>
-              {frameworks.map((framework) => (
-                <CommandItem
-                  className="group"
-                  key={framework.value}
-                  value={framework.value}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
-                    setOpen(false);
-                  }}
-                  data-checked={value === framework.value}
-                >
-                  {framework.label}
-                  <CheckIcon className="mr-2 h-4 w-4 opacity-0 group-data-[checked=true]:opacity-100" />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
+        {filterCol ? (
+          (() => {
+            const column = table.getColumn(filterCol)!;
+            const currentFilters = (column.getFilterValue() as string[]) || [];
+
+            return (
+              <Command>
+                <CommandInput
+                  placeholder={`Search ${
+                    typeof column.columnDef.header === "string"
+                      ? column.columnDef.header
+                      : column.columnDef.id
+                  }...`}
+                />
+                <CommandList>
+                  <CommandEmpty>No framework found.</CommandEmpty>
+                  <CommandGroup>
+                    {column.columnDef.meta?.filterOptions?.map((option) => (
+                      <CommandItem
+                        className="group"
+                        key={option}
+                        value={option}
+                        onSelect={handleSelect}
+                        data-checked={currentFilters.includes(option)}
+                      >
+                        {option}
+                        <CheckIcon className="ml-auto h-4 w-4 opacity-0 group-data-[checked=true]:opacity-100" />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            );
+          })()
+        ) : (
+          <Command>
+            <CommandInput placeholder="Search column..." />
+            <CommandList>
+              <CommandEmpty>No framework found.</CommandEmpty>
+              <CommandGroup>
+                {table.getAllColumns().map((column) =>
+                  column.getCanFilter() &&
+                  column.columnDef.meta?.filterOptions ? (
+                    <CommandItem
+                      className="group"
+                      key={column.id}
+                      value={column.id}
+                      onSelect={(colId: string) => {
+                        setFilterCol(colId);
+                      }}
+                    >
+                      {typeof column.columnDef.header === "string"
+                        ? column.columnDef.header
+                        : column.columnDef.id}
+                      <CheckIcon className="ml-auto h-4 w-4 opacity-0 group-data-[checked=true]:opacity-100" />
+                    </CommandItem>
+                  ) : null,
+                )}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        )}
       </PopoverContent>
     </Popover>
   );
