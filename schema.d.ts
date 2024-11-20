@@ -500,6 +500,7 @@ export interface components {
         Automation: {
             id: string;
             type: components["schemas"]["AutomationTypeId"];
+            sas: components["schemas"]["SAS"];
             state: components["schemas"]["State"];
             /** Format: date-time */
             last_activity: string;
