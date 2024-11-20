@@ -38,9 +38,7 @@ function HomeComponent() {
 const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
   {
     accessorKey: "state",
-    header: "State",
     filterFn: "arrIncludesSome",
-    size: 32,
   },
   {
     accessorKey: "id",
@@ -92,36 +90,54 @@ const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
   {
     accessorKey: "job",
     header: "Current job",
-    cell: ({ row }) => (
-      <div>
-        <div className="font-medium">SAS_JORGE</div>
-        <div className="text-gray-11">26799402790</div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "",
-    header: "Current job",
-
-    cell: ({ row }) =>
-      (() => {
-        const percentagePoints = [
-          0.7, 0.6, 0.55, 0.6, 0.75, 0.8, 0.9, 0.85, 0.7, 0.6, 0.5, 0.4,
-        ];
-        const pathData = percentagePoints
-          .map(
-            (y, i) =>
-              `${i === 0 ? "M" : "L"}${(i * 128) / (percentagePoints.length - 1)} ${32 - y * 32}`,
-          )
-          .join(" ");
+    cell: ({ row }) => {
+      const { data, isLoading } = api.useQuery("get", "/jobs", {
+        // @ts-expect-error param
+        params: { query: { runner_eq: row.original.id } },
+      });
+      if (isLoading) {
+        return (
+          <div>
+            <div className="mb-1 h-4 w-20 animate-pulse rounded-md bg-gray-2" />
+            <div className="h-4 w-24 animate-pulse rounded-md bg-gray-2" />
+          </div>
+        );
+      }
+      if (data && data.length > 0) {
+        const job = data[0]!;
 
         return (
-          <svg className="h-8 w-32 stroke-blue-9">
-            <path d={pathData} fill="none" strokeWidth="1" />
-          </svg>
+          <div>
+            <div className="font-medium">{job.SAS}</div>
+            <div className="text-gray-11">{job.id}</div>
+          </div>
         );
-      })(),
+      }
+    },
   },
+  // {
+  //   accessorKey: "",
+  //   header: "Current job",
+
+  //   cell: ({ row }) =>
+  //     (() => {
+  //       const percentagePoints = [
+  //         0.7, 0.6, 0.55, 0.6, 0.75, 0.8, 0.9, 0.85, 0.7, 0.6, 0.5, 0.4,
+  //       ];
+  //       const pathData = percentagePoints
+  //         .map(
+  //           (y, i) =>
+  //             `${i === 0 ? "M" : "L"}${(i * 128) / (percentagePoints.length - 1)} ${32 - y * 32}`,
+  //         )
+  //         .join(" ");
+
+  //       return (
+  //         <svg className="h-8 w-32 stroke-blue-9">
+  //           <path d={pathData} fill="none" strokeWidth="1" />
+  //         </svg>
+  //       );
+  //     })(),
+  // },
 ];
 
 import {
@@ -170,7 +186,6 @@ export function DataTable() {
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    debugTable: true,
     initialState: {
       pagination: {
         pageSize: 10,
@@ -197,6 +212,7 @@ export function DataTable() {
             }
             table={table}
           />
+
           {table.getState().columnFilters.map((colFilter) => {
             const column = table.getColumn(colFilter.id)!;
             const colFilters = colFilter.value as string[];
