@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   type ColumnDef,
   flexRender,
@@ -75,15 +75,19 @@ const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
+    cell: ({ row, cell }) => (
       <div className="flex items-center">
         <RunnerState state={row.original.state!} />
-        <div className="ml-6">
-          <div className="font-medium">{row.getValue("id")}</div>
+        <Link
+          to="/runners/$id"
+          params={{ id: row.original.id! }}
+          className="ml-6"
+        >
+          <div className="font-medium">{row.original.id}</div>
           <div className="text-gray-11">
             {row.original.organization} / {row.original.runner_group}
           </div>
-        </div>
+        </Link>
       </div>
     ),
   },
