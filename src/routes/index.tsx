@@ -59,9 +59,9 @@ const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
             <g className="group-data-[order=desc]:stroke-gray-12">
               <path d="m21 16-4 4-4-4" />
