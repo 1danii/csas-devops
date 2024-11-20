@@ -2,14 +2,16 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  ColumnDef,
+  type ColumnDef,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
-  Table as ReactTable,
+  getSortedRowModel,
+  type Table as ReactTable,
   useReactTable,
 } from "@tanstack/react-table";
-import { components } from "schema";
+import { type components } from "schema";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -33,34 +35,56 @@ function HomeComponent() {
   );
 }
 
-declare module "@tanstack/react-table" {
-  //allows us to define custom properties for our columns
-  interface ColumnMeta {
-    filterOptions?: string[];
-  }
-}
 const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
   {
     accessorKey: "state",
     header: "State",
-    cell: ({ row }) => <div className="size-3 rounded-full bg-green-9" />,
-    meta: {
-      filterOptions: [
-        "active",
-        "failed",
-        "idle",
-        "offline",
-      ] as components["schemas"]["RunnerState"][],
-    },
+    filterFn: "arrIncludesSome",
+    size: 32,
   },
   {
     accessorKey: "id",
-    header: "Name",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="group -ml-4"
+          data-order={column.getIsSorted()}
+          onClick={() => column.toggleSorting()}
+        >
+          Runner
+          <svg
+            className="stroke-gray-9"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <g className="group-data-[order=desc]:stroke-gray-12">
+              <path d="m21 16-4 4-4-4" />
+              <path d="M17 20V4" />
+            </g>
+            <g className="group-data-[order=asc]:stroke-gray-12">
+              <path d="m3 8 4-4 4 4" />
+              <path d="M7 4v16" />
+            </g>
+          </svg>
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div>
-        <div className="font-medium">{row.getValue("id")}</div>
-        <div className="text-gray-11">
-          {row.original.organization} / {row.original.runner_group}
+      <div className="flex items-center">
+        <RunnerState state={row.original.state!} />
+        <div className="ml-6">
+          <div className="font-medium">{row.getValue("id")}</div>
+          <div className="text-gray-11">
+            {row.original.organization} / {row.original.runner_group}
+          </div>
         </div>
       </div>
     ),
@@ -78,6 +102,7 @@ const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
   {
     accessorKey: "",
     header: "Current job",
+
     cell: ({ row }) =>
       (() => {
         const percentagePoints = [
@@ -92,12 +117,7 @@ const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
 
         return (
           <svg className="h-8 w-32 stroke-blue-9">
-            <path
-              d={pathData}
-              fill="none"
-              // stroke="currentColor"
-              strokeWidth="1"
-            />
+            <path d={pathData} fill="none" strokeWidth="1" />
           </svg>
         );
       })(),
@@ -106,7 +126,6 @@ const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
 
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -117,6 +136,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { RunnerState } from "@/components/ui/runner-state";
 import {
   Table,
   TableBody,
@@ -125,13 +145,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ColumnFiltersState } from "@tanstack/react-table";
 import {
   CheckIcon,
   ChevronFirstIcon,
   ChevronLastIcon,
   ChevronLeftIcon,
-  ChevronRightIcon,
   ListFilterIcon,
   SearchIcon,
   XIcon,
@@ -139,16 +157,7 @@ import {
 import { useMemo, useState } from "react";
 
 export function DataTable() {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
-  const query = useMemo(
-    () => Object.fromEntries(columnFilters.map((t) => [`${t.id}_eq`, t.value])),
-    [columnFilters],
-  );
-
-  const { data, isLoading } = api.useQuery("get", "/runners", {
-    params: { query },
-  });
+  const { data, isLoading } = api.useQuery("get", "/runners");
 
   const tableData = useMemo(() => {
     return data ?? [];
@@ -159,15 +168,15 @@ export function DataTable() {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    manualFiltering: true,
-    onColumnFiltersChange: setColumnFilters,
-    state: {
-      columnFilters,
-    },
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     debugTable: true,
     initialState: {
       pagination: {
         pageSize: 10,
+      },
+      columnVisibility: {
+        state: false,
       },
     },
   });
@@ -176,32 +185,48 @@ export function DataTable() {
     <>
       <div className="flex justify-between pb-2">
         <div className="flex gap-2">
-          <TableFilterMenu table={table} />
-          {table.getState().columnFilters.map((filter) => {
-            const column = table.getColumn(filter.id);
-            const value = filter.value as string;
-            return (
-              <div key={filter.id} className="flex items-center gap-1">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    column?.setFilterValue(undefined);
-                  }}
-                  key={value}
-                  className="flex items-center gap-1 rounded-md border px-2 py-1"
-                >
-                  <span className="text-gray-11">
-                    {typeof column?.columnDef.header === "string"
-                      ? column.columnDef.header
-                      : filter.id}
-                    :
-                  </span>
-                  <span>{value}</span>
-                  <XIcon />
-                </Button>
-              </div>
-            );
+          <TableFilter
+            colId="state"
+            options={
+              [
+                "active",
+                "failed",
+                "idle",
+                "offline",
+              ] as components["schemas"]["RunnerState"][]
+            }
+            table={table}
+          />
+          {table.getState().columnFilters.map((colFilter) => {
+            const column = table.getColumn(colFilter.id)!;
+            const colFilters = colFilter.value as string[];
+            return colFilters.map((filter) => {
+              return (
+                <div key={filter} className="flex items-center gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      column.setFilterValue(
+                        ((column.getFilterValue() as string[]) ?? []).filter(
+                          (oldFilter) => oldFilter !== filter,
+                        ),
+                      );
+                    }}
+                    className="flex items-center gap-1 rounded-md border px-2 py-1"
+                  >
+                    <span className="text-gray-11">
+                      {typeof column?.columnDef.header === "string"
+                        ? column.columnDef.header
+                        : colFilter.id}
+                      :
+                    </span>
+                    <span>{filter}</span>
+                    <XIcon />
+                  </Button>
+                </div>
+              );
+            });
           })}
         </div>
         <Button variant="outline">
@@ -324,16 +349,27 @@ function TablePagination<TData>({ table }: { table: ReactTable<TData> }) {
   );
 }
 
-function TableFilterMenu<TData>({ table }: { table: ReactTable<TData> }) {
+function TableFilter<TData>({
+  table,
+  colId,
+  options,
+}: {
+  table: ReactTable<TData>;
+  colId: string;
+  options: string[];
+}) {
   const [open, setOpen] = useState(false);
-  const [filterCol, setFilterCol] = useState<string | undefined>(undefined);
+  const column = table.getColumn(colId);
+  if (!column) return null;
 
+  const currentFilters = (column.getFilterValue() as string[]) || [];
   const handleSelect = (value: string) => {
-    const column = table.getColumn(filterCol!);
-    if (column) {
-      column.setFilterValue(value);
-      setOpen(false);
-      setFilterCol(undefined);
+    if (currentFilters.includes(value)) {
+      column.setFilterValue(
+        currentFilters.filter((filter) => filter !== value),
+      );
+    } else {
+      column.setFilterValue([...currentFilters, value]);
     }
   };
 
@@ -345,68 +381,31 @@ function TableFilterMenu<TData>({ table }: { table: ReactTable<TData> }) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
-        {filterCol ? (
-          (() => {
-            const column = table.getColumn(filterCol)!;
-            const currentFilters = (column.getFilterValue() as string[]) || [];
-
-            return (
-              <Command>
-                <CommandInput
-                  placeholder={`Search ${
-                    typeof column.columnDef.header === "string"
-                      ? column.columnDef.header
-                      : column.columnDef.id
-                  }...`}
-                />
-                <CommandList>
-                  <CommandEmpty>No framework found.</CommandEmpty>
-                  <CommandGroup>
-                    {column.columnDef.meta?.filterOptions?.map((option) => (
-                      <CommandItem
-                        className="group"
-                        key={option}
-                        value={option}
-                        onSelect={handleSelect}
-                        data-checked={currentFilters.includes(option)}
-                      >
-                        {option}
-                        <CheckIcon className="ml-auto h-4 w-4 opacity-0 group-data-[checked=true]:opacity-100" />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            );
-          })()
-        ) : (
-          <Command>
-            <CommandInput placeholder="Search column..." />
-            <CommandList>
-              <CommandEmpty>No framework found.</CommandEmpty>
-              <CommandGroup>
-                {table.getAllColumns().map((column) =>
-                  column.getCanFilter() &&
-                  column.columnDef.meta?.filterOptions ? (
-                    <CommandItem
-                      className="group"
-                      key={column.id}
-                      value={column.id}
-                      onSelect={(colId: string) => {
-                        setFilterCol(colId);
-                      }}
-                    >
-                      {typeof column.columnDef.header === "string"
-                        ? column.columnDef.header
-                        : column.columnDef.id}
-                      <CheckIcon className="ml-auto h-4 w-4 opacity-0 group-data-[checked=true]:opacity-100" />
-                    </CommandItem>
-                  ) : null,
-                )}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        )}
+        <Command>
+          <CommandInput
+            placeholder={`Search ${
+              typeof column.columnDef.header === "string"
+                ? column.columnDef.header
+                : column.columnDef.id
+            }...`}
+          />
+          <CommandList>
+            <CommandGroup>
+              {options.map((option) => (
+                <CommandItem
+                  className="group"
+                  key={option}
+                  value={option}
+                  onSelect={handleSelect}
+                  data-checked={currentFilters.includes(option)}
+                >
+                  {option}
+                  <CheckIcon className="ml-auto h-4 w-4 opacity-0 group-data-[checked=true]:opacity-100" />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   );

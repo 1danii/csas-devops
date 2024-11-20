@@ -10,7 +10,8 @@ export default {
       blue: generateScale("blue"),
       gray: generateScale("slate"),
       green: generateScale("green"),
-      amber: generateScale("amber"),
+      yellow: generateScale("amber"),
+      red: generateScale("red"),
       primary: "var(--color-primary)",
     },
     extend: {

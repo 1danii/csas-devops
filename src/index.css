@@ -7,6 +7,9 @@
 @import "@radix-ui/colors/amber.css";
 @import "@radix-ui/colors/amber-alpha.css";
 
+@import "@radix-ui/colors/red.css";
+@import "@radix-ui/colors/red-alpha.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
