@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import { Link, type LinkComponentProps } from "@tanstack/react-router";
-import { Column, Table } from "@tanstack/react-table";
+import { type Column, Table as ReactTable } from "@tanstack/react-table";
 import {
   CheckIcon,
   ChevronFirstIcon,
@@ -28,7 +28,7 @@ function TableFilter<TData>({
   options,
 }: {
   label: string;
-  table: Table<TData>;
+  table: ReactTable<TData>;
   colId: string;
   options: string[];
 }) {
@@ -101,7 +101,7 @@ function TableFilter<TData>({
   );
 }
 
-function TablePagination<TData>({ table }: { table: Table<TData> }) {
+function TablePagination<TData>({ table }: { table: ReactTable<TData> }) {
   return (
     <div className="flex items-center justify-end space-x-2 py-4">
       <div className="flex items-center gap-2">
