@@ -32,6 +32,7 @@ import {
   ChevronUp,
   CpuIcon,
   EyeIcon,
+  GitCommitHorizontalIcon,
   HardDriveIcon,
   HardDriveUploadIcon,
   MemoryStickIcon,
@@ -66,7 +67,7 @@ const runnerJobsQueryOptions = (id: string) =>
 
 export const Route = createFileRoute("/runners/$id")({
   component: RouteComponent,
-  loader: async ({ params, context: { queryClient } }) => {
+  loader: ({ params, context: { queryClient } }) => {
     void queryClient.ensureQueryData(runnerQueryOptions(params.id));
     void queryClient.ensureQueryData(runnerMetricsQueryOptions(params.id));
     void queryClient.ensureQueryData(runnerJobsQueryOptions(params.id));
@@ -76,31 +77,36 @@ export const Route = createFileRoute("/runners/$id")({
 function RouteComponent() {
   const { id } = Route.useParams();
   const runner = useQuery(runnerQueryOptions(id));
-
   const metrics = useQuery(runnerMetricsQueryOptions(id)) as UseQueryResult<{
     runner: string;
     metrics: components["schemas"]["Metric"][];
   }>;
-
   const jobs = useQuery(runnerJobsQueryOptions(id));
 
   const latestMetrics = metrics.data?.metrics[0];
 
-  const [selectedMetric, setSelectedMetric] = useState("cpu");
-
   return (
     <div>
       <span className="text-sm font-medium text-gray-11">Runner</span>
-      <div className="flex items-center pb-4">
+      <div className="pb-4">
         {runner.data ? (
           <>
-            <h1 className="mr-2 text-3xl font-semibold">{runner.data?.id}</h1>
-            {runner.data && <RunnerStateBadge state={runner.data.state!} />}
+            <div className="flex items-center">
+              <h1 className="mr-2 text-3xl font-semibold">{runner.data?.id}</h1>
+              {runner.data && <RunnerStateBadge state={runner.data.state!} />}
+            </div>
+            <div className="text-sm text-gray-11">
+              {runner.data.organization} / {runner.data.runner_group}
+            </div>
           </>
         ) : (
-          <div className="h-9 w-full animate-pulse rounded-md bg-gray-2" />
+          <>
+            <div className="h-8 w-[580px] animate-pulse rounded-md bg-gray-2" />
+            <div className="mt-2 h-4 w-52 animate-pulse rounded-md bg-gray-2" />
+          </>
         )}
       </div>
+
       <div className="flex h-24 gap-x-4">
         {latestMetrics ? (
           <>
@@ -147,60 +153,81 @@ function RouteComponent() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4 pt-6">
-        <div>
-          <h2 className="mr-2 pb-2 text-xl font-semibold">Metrics</h2>
-          <div className="flex h-72 flex-col items-start justify-between">
-            <Select value={selectedMetric} onValueChange={setSelectedMetric}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Data</SelectLabel>
-                  <SelectItem value="cpu">CPU load</SelectItem>
-                  <SelectItem value="memory">Memory used</SelectItem>
-                  <SelectItem value="network">Network</SelectItem>
-                  <SelectItem value="disk">Disk</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            {metrics.data?.metrics ? (
-              <Chart
-                metrics={metrics.data.metrics}
-                selectedMetric={selectedMetric}
-              />
-            ) : (
-              <div className="h-60 w-full animate-pulse rounded-md bg-gray-2" />
-            )}
-          </div>
-        </div>
+      <div className="flex flex-col pt-4">
+        <span className="pb-2 text-sm font-medium text-gray-11">
+          Assigned jobs
+        </span>
 
-        <div>
-          <h2 className="mr-2 pb-2 text-xl font-semibold">Jobs</h2>
-          {jobs.data ? (
-            <div className="flex h-72 flex-col justify-between gap-y-4">
-              {jobs.data.map((job) => {
-                return (
-                  <Card key={job.id} className="flex items-center p-4">
-                    <JobStateDot className="mr-4" state={job.state!} />
-                    <div className="flex flex-1 items-center justify-between">
-                      <div className="flex flex-col">
-                        <div className="text-base font-semibold">{job.SAS}</div>
-                        <div className="text-xs font-medium text-gray-11">
-                          {job.id}
-                        </div>
-                      </div>
+        {jobs.data ? (
+          <div className="flex flex-col gap-y-4">
+            {jobs.data.map((job) => {
+              return (
+                <Card key={job.id} className="flex items-center p-4">
+                  <JobStateDot className="mr-4" state={job.state!} />
+                  <div className="flex flex-1 items-center">
+                    <div className="flex flex-col">
+                      <div className="text-base font-semibold">{job.SAS}</div>
                       <div className="text-xs font-medium text-gray-11">
-                        {DateTime.fromISO(job.timestamp!).toRelative()}
+                        {job.id}
                       </div>
                     </div>
-                  </Card>
-                );
-              })}
-            </div>
+                    <div className="ml-6 text-xs font-medium text-gray-11">
+                      {DateTime.fromISO(job.timestamp!).toRelative()}
+                    </div>
+                    <div className="ml-48 flex flex-col">
+                      <div className="text-xs font-medium text-gray-11">
+                        Triggered by
+                      </div>
+                      <div className="flex items-center text-base font-medium">
+                        <GitCommitHorizontalIcon className="mr-2 size-4 text-gray-11" />
+                        p7v46705x
+                      </div>
+                    </div>
+
+                    <Button className="ml-auto" asChild variant="outline">
+                      <Link to={`/jobs`}>View details</Link>
+                    </Button>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="h-72 w-full animate-pulse rounded-md bg-gray-2" />
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 pt-6">
+        <div className="flex flex-col">
+          <h2 className="mr-2 pb-2 text-xl font-semibold">CPU load</h2>
+          {metrics.data?.metrics ? (
+            <Chart metrics={metrics.data.metrics} selectedMetric="cpu" />
           ) : (
-            <div className="h-72 w-full animate-pulse rounded-md bg-gray-2" />
+            <div className="h-60 w-full animate-pulse rounded-md bg-gray-2" />
+          )}
+        </div>
+        <div className="flex flex-col">
+          <h2 className="mr-2 pb-2 text-xl font-semibold">Memory used</h2>
+          {metrics.data?.metrics ? (
+            <Chart metrics={metrics.data.metrics} selectedMetric="memory" />
+          ) : (
+            <div className="h-60 w-full animate-pulse rounded-md bg-gray-2" />
+          )}
+        </div>
+        <div className="flex flex-col">
+          <h2 className="mr-2 pb-2 text-xl font-semibold">Network</h2>
+          {metrics.data?.metrics ? (
+            <Chart metrics={metrics.data.metrics} selectedMetric="network" />
+          ) : (
+            <div className="h-60 w-full animate-pulse rounded-md bg-gray-2" />
+          )}
+        </div>
+        <div className="flex flex-col">
+          <h2 className="mr-2 pb-2 text-xl font-semibold">Disk</h2>
+          {metrics.data?.metrics ? (
+            <Chart metrics={metrics.data.metrics} selectedMetric="disk" />
+          ) : (
+            <div className="h-60 w-full animate-pulse rounded-md bg-gray-2" />
           )}
         </div>
       </div>
@@ -229,7 +256,7 @@ function Chart({
   selectedMetric,
 }: {
   metrics: components["schemas"]["Metric"][];
-  selectedMetric: string;
+  selectedMetric: "cpu" | "memory" | "network" | "disk";
 }) {
   const chartData = metrics.map((metric) => ({
     cpu: Number(metric.cpu),
@@ -254,7 +281,8 @@ function Chart({
       }
       className="max-h-60 w-full"
     >
-      <AreaChart accessibilityLayer data={chartData}>
+      {/* @ts-expect-error margin type */}
+      <AreaChart margin={0} accessibilityLayer data={chartData}>
         <ChartTooltip content={<ChartTooltipContent />} />
         <CartesianGrid strokeDasharray={2} vertical={false} />
         <XAxis
@@ -276,7 +304,7 @@ function Chart({
             <YAxis
               dataKey="cpu"
               tickLine={false}
-              tickMargin={16}
+              tickMargin={20}
               axisLine={false}
               tickFormatter={(value) => (value * 100).toFixed(0) + "%"}
             />
@@ -288,7 +316,7 @@ function Chart({
             <YAxis
               dataKey="memory"
               tickLine={false}
-              tickMargin={16}
+              tickMargin={20}
               axisLine={false}
               tickFormatter={(value) => (value * 100).toFixed(0) + "%"}
             />
@@ -304,7 +332,7 @@ function Chart({
             <YAxis
               dataKey="fs_writes"
               tickLine={false}
-              tickMargin={16}
+              tickMargin={20}
               axisLine={false}
               tickFormatter={(value: number) => formatMemory(value)}
             />
@@ -325,7 +353,7 @@ function Chart({
             <YAxis
               dataKey="fs_writes"
               tickLine={false}
-              tickMargin={16}
+              tickMargin={20}
               axisLine={false}
               tickFormatter={(value: number) => formatMemory(value)}
             />
