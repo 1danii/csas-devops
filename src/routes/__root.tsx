@@ -2,7 +2,12 @@ import { Button } from "@/components/ui/button";
 import "@/index.css";
 import { type QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
+import {
+  Link,
+  Outlet,
+  createRootRoute,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
 import { ServerCogIcon } from "lucide-react";
 import * as React from "react";
 
@@ -22,7 +27,7 @@ interface MyRouterContext {
   queryClient: QueryClient;
 }
 
-export const Route = createRootRoute<MyRouterContext>({
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootComponent,
 });
 
@@ -38,7 +43,7 @@ function RootComponent() {
               className="group justify-start text-left text-gray-11 data-[active=true]:bg-gray-4 data-[active=true]:text-gray-12"
             >
               <Link
-                to="/"
+                to="/runners"
                 data-active={false}
                 activeProps={{ "data-active": true }}
               >
@@ -50,7 +55,7 @@ function RootComponent() {
         </div>
         <div className="flex flex-1 flex-col">
           <div className="h-12 shrink-0 border-b"></div>
-          <div className="flex-1 overflow-auto px-12 py-6">
+          <div className="flex-1 overflow-auto px-12 py-8">
             <Outlet />
           </div>
         </div>
