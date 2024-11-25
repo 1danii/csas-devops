@@ -27,6 +27,9 @@ import type { components } from "schema";
 
 export const Route = createFileRoute("/runners/stats")({
   component: RouteComponent,
+  loader: ({ context: { queryClient } }) => {
+    void queryClient.ensureQueryData(api.queryOptions("get", "/runners"));
+  },
 });
 
 const runnerStates: components["schemas"]["RunnerState"][] = [
@@ -80,7 +83,6 @@ function RouteComponent() {
       const idle = Math.max(0, baseData.idle + variation());
       const total = runners.data.length;
       const offline = total - (active + failed + idle);
-      // Adjust offline to maintain total
 
       return { active, failed, idle, offline, total };
     });
@@ -91,26 +93,26 @@ function RouteComponent() {
       <h1 className="pb-4 text-3xl font-semibold">Runner stats</h1>
 
       <div className="flex gap-4">
-        {runnerData && (
-          <>
-            <div className="flex-1">
-              <Select
-                value={selectedChart}
-                onValueChange={(v: components["schemas"]["RunnerState"]) =>
-                  setSelectedChart(v)
-                }
-              >
-                <SelectTrigger className="mb-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {runnerStates.map((state, i) => (
-                    <SelectItem key={i} value={state}>
-                      {state}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        <>
+          <div className="flex-1">
+            <Select
+              value={selectedChart}
+              onValueChange={(v: components["schemas"]["RunnerState"]) =>
+                setSelectedChart(v)
+              }
+            >
+              <SelectTrigger className="mb-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {runnerStates.map((state, i) => (
+                  <SelectItem key={i} value={state}>
+                    {state}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {runnerDataTime ? (
               <ChartContainer
                 config={{} satisfies ChartConfig}
                 className="max-h-80 w-full"
@@ -169,19 +171,23 @@ function RouteComponent() {
                   )}
                 </AreaChart>
               </ChartContainer>
-            </div>
+            ) : (
+              <div className="size-full max-h-80 animate-pulse rounded-md bg-gray-2" />
+            )}
+          </div>
 
-            <div className="size-80">
-              <h2 className="mb-2 text-xl font-semibold">Total runners</h2>
+          <div className="size-80">
+            <h2 className="mb-3 text-xl font-semibold">Total runners</h2>
 
-              {/* @ts-expect-error div in chart */}
+            {runnerData && runners.data ? (
+              /* @ts-expect-error div in chart */
               <ChartContainer
                 config={{} satisfies ChartConfig}
                 className="relative aspect-square max-w-80"
               >
                 <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col justify-center text-center">
                   <span className="text-4xl font-semibold">
-                    {runners.data?.length}
+                    {runners.data.length}
                   </span>
                   <span className="text-sm font-medium text-gray-11">
                     Runners
@@ -198,9 +204,11 @@ function RouteComponent() {
                   />
                 </PieChart>
               </ChartContainer>
-            </div>
-          </>
-        )}
+            ) : (
+              <div className="aspect-square max-w-80 animate-pulse rounded-md bg-gray-2" />
+            )}
+          </div>
+        </>
       </div>
     </div>
   );

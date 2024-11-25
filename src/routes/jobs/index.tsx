@@ -83,7 +83,7 @@ const columns: ColumnDef<components["schemas"]["Job"]>[] = [
   },
 ];
 
-export function DataTable() {
+function DataTable() {
   const { data, isLoading } = api.useQuery("get", "/jobs");
 
   const tableData = useMemo(() => {
@@ -138,7 +138,7 @@ export function DataTable() {
           />
         </div>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border bg-primary">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

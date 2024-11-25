@@ -1,3 +1,4 @@
+import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import "@/index.css";
 import * as Collapsible from "@radix-ui/react-collapsible";
@@ -10,9 +11,11 @@ import {
   createRootRouteWithContext,
 } from "@tanstack/react-router";
 import {
+  BotIcon,
   ChartBar,
   ChevronDownIcon,
   CloudCogIcon,
+  Layers3Icon,
   ServerCogIcon,
 } from "lucide-react";
 import * as React from "react";
@@ -93,11 +96,15 @@ function RootComponent() {
   return (
     <>
       <main className="flex h-screen overflow-hidden">
-        <div className="w-60 shrink-0 border-r">
+        <div className="flex w-60 shrink-0 flex-col border-r">
           <div className="flex h-12 items-center px-4 text-xl font-semibold">
             DOPO
           </div>
           <nav className="flex flex-col px-4 py-2">
+            <NavButton to="/sas">
+              <Layers3Icon className="group-data-[active=true]:text-blue-9" />
+              SAS Directory
+            </NavButton>
             <NavButton to="/runners">
               <ServerCogIcon className="group-data-[active=true]:text-blue-9" />
               Runners
@@ -106,16 +113,23 @@ function RootComponent() {
               <CloudCogIcon className="group-data-[active=true]:text-blue-9" />
               Jobs
             </NavButton>
+            <NavButton to="/automations">
+              <BotIcon className="group-data-[active=true]:text-blue-9" />
+              Automations
+            </NavButton>
             <NavButtonCollapsible
               links={[{ label: "Runners", to: "/runners/stats" }]}
             >
               <ChartBar /> Metrics
             </NavButtonCollapsible>
           </nav>
+          <div className="mt-auto flex h-16 items-center px-4">
+            <ModeToggle />
+          </div>
         </div>
         <div className="flex flex-1 flex-col">
           <div className="h-12 shrink-0 border-b"></div>
-          <div className="flex-1 overflow-auto px-12 py-8">
+          <div className="flex-1 overflow-auto bg-gray-1 px-12 py-8">
             <Outlet />
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { JobStateBadge, JobStateDot } from "@/components/job-state";
+import { useTheme } from "@/components/theme-provider";
 import { Card } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -95,7 +96,9 @@ const CustomNode = memo(({ data, id }: NodeProps<JobNode>) => {
           <div key={i} className="flex items-center justify-between">
             <div className="flex items-center">
               <JobStateDot state={job.state} />
-              <span className="ml-4 text-sm font-semibold">{job.name}</span>
+              <span className="ml-4 text-sm font-semibold text-gray-12">
+                {job.name}
+              </span>
             </div>
             {job.duration && (
               <div className="text-xs font-medium text-gray-11">
@@ -143,6 +146,7 @@ const jobQueryOptions = (id: string) =>
   api.queryOptions("get", "/jobs/{id}", { params: { path: { id } } });
 
 function RouteComponent() {
+  const { theme } = useTheme();
   const { id } = Route.useParams();
   const job = useQuery(jobQueryOptions(id));
 
@@ -247,6 +251,7 @@ function RouteComponent() {
             nodeTypes={nodeTypes}
             nodes={initialNodes}
             edges={initialEdges}
+            colorMode={theme}
           >
             <Background />
           </ReactFlow>

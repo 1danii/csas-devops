@@ -129,7 +129,7 @@ const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
   // },
 ];
 
-export function DataTable() {
+function DataTable() {
   const { data, isLoading } = api.useQuery("get", "/runners");
 
   const tableData = useMemo(() => {
@@ -186,7 +186,7 @@ export function DataTable() {
           />
         </div>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border bg-primary">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

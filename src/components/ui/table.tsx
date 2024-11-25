@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import { Link, type LinkComponentProps } from "@tanstack/react-router";
-import { type Column, Table as ReactTable } from "@tanstack/react-table";
+import { type Column, type Table as ReactTable } from "@tanstack/react-table";
 import {
   CheckIcon,
   ChevronFirstIcon,
@@ -89,7 +89,7 @@ function TableFilter<TData>({
                   onSelect={handleSelect}
                   data-checked={currentFilters.includes(option)}
                 >
-                  {option}
+                  <span className="truncate">{option}</span>
                   <CheckIcon className="ml-auto h-4 w-4 opacity-0 group-data-[checked=true]:opacity-100" />
                 </CommandItem>
               ))}

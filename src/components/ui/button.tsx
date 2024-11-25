@@ -5,7 +5,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center text-sm justify-center gap-2 whitespace-nowrap rounded-md font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center select-none text-sm justify-center gap-2 whitespace-nowrap rounded-md font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -14,7 +14,7 @@ const buttonVariants = cva(
           "border border-gray-6 bg-primary hover:bg-gray-3 text-gray-12 data-[state=open]:bg-gray-3",
         secondary: "bg-gray-3 text-gray-12 hover:bg-gray-4",
         link: "text-gray-12 underline-offset-4 hover:underline",
-        ghost: "hover:bg-gray-3",
+        ghost: "hover:bg-gray-3 focus-within:bg-gray-3",
       },
       size: {
         default: "h-8 px-4",

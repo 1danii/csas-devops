@@ -15,9 +15,11 @@ const dotVariants = {
 export function JobStateDot({
   state,
   className,
+  showIcon = true,
 }: {
   state: JobState;
   className?: string;
+  showIcon?: boolean;
 }) {
   return (
     <div
@@ -27,13 +29,12 @@ export function JobStateDot({
         className,
       )}
     >
-      {state === "success" && (
-        <CheckIcon strokeWidth={3} width="auto" height="auto" />
+      {showIcon && state === "success" && (
+        <CheckIcon strokeWidth={3} className="size-full" />
       )}
-      {state === "failed" && (
+      {showIcon && state === "failed" && (
         <svg
-          width="auto"
-          height="auto"
+          className="size-full"
           viewBox="0 0 2 8"
           strokeWidth={2}
           fill="none"
@@ -43,8 +44,8 @@ export function JobStateDot({
           <circle cx="1" cy="7" r="1" fill="currentColor" />
         </svg>
       )}
-      {state === "queued" && (
-        <ClockIcon strokeWidth={3} width="auto" height="auto" />
+      {showIcon && state === "queued" && (
+        <ClockIcon strokeWidth={3} className="size-full" />
       )}
     </div>
   );
@@ -57,7 +58,13 @@ const badgeVariants = {
   failed: "border-red-7 bg-red-a3 text-red-9",
 } satisfies Record<JobState, string>;
 
-export function JobStateBadge({ state }: { state: JobState }) {
+export function JobStateBadge({
+  state,
+  label,
+}: {
+  state: JobState;
+  label?: string;
+}) {
   return (
     <div
       className={cn(
@@ -65,8 +72,8 @@ export function JobStateBadge({ state }: { state: JobState }) {
         badgeVariants[state],
       )}
     >
-      <JobStateDot className="mr-1 size-1.5" state={state} />
-      {state}
+      <JobStateDot showIcon={false} className="mr-1 size-1.5" state={state} />
+      {label ?? state}
     </div>
   );
 }
