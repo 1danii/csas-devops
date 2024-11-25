@@ -4,11 +4,11 @@ import { type QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   Link,
+  type LinkComponentProps,
   Outlet,
-  createRootRoute,
   createRootRouteWithContext,
 } from "@tanstack/react-router";
-import { ServerCogIcon } from "lucide-react";
+import { CloudCogIcon, ServerCogIcon } from "lucide-react";
 import * as React from "react";
 
 const TanStackRouterDevtools =
@@ -31,26 +31,41 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootComponent,
 });
 
+function NavButton({
+  children,
+  ...props
+}: React.PropsWithChildren<LinkComponentProps>) {
+  return (
+    <Button
+      asChild
+      variant="ghost"
+      className="group justify-start text-left text-gray-11 data-[active=true]:bg-gray-4 data-[active=true]:text-gray-12"
+    >
+      <Link
+        {...props}
+        data-active={false}
+        activeProps={{ "data-active": true }}
+      >
+        {children}
+      </Link>
+    </Button>
+  );
+}
+
 function RootComponent() {
   return (
     <>
       <main className="flex h-screen overflow-hidden">
         <div className="w-60 shrink-0 border-r">
           <nav className="flex flex-col gap-y-1 px-4 py-6">
-            <Button
-              asChild
-              variant="ghost"
-              className="group justify-start text-left text-gray-11 data-[active=true]:bg-gray-4 data-[active=true]:text-gray-12"
-            >
-              <Link
-                to="/runners"
-                data-active={false}
-                activeProps={{ "data-active": true }}
-              >
-                <ServerCogIcon className="group-data-[active=true]:text-blue-9" />
-                Runners
-              </Link>
-            </Button>
+            <NavButton to="/runners">
+              <ServerCogIcon className="group-data-[active=true]:text-blue-9" />
+              Runners
+            </NavButton>
+            <NavButton to="/jobs">
+              <CloudCogIcon className="group-data-[active=true]:text-blue-9" />
+              Jobs
+            </NavButton>
           </nav>
         </div>
         <div className="flex flex-1 flex-col">

@@ -12,7 +12,7 @@ export default {
       green: generateScale("green"),
       yellow: generateScale("amber"),
       red: generateScale("red"),
-      primary: "var(--color-primary)",
+      primary: "var(--primary)",
     },
     extend: {
       borderRadius: {

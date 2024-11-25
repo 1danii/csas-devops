@@ -93,7 +93,7 @@ function RouteComponent() {
           <>
             <div className="flex items-center">
               <h1 className="mr-2 text-3xl font-semibold">{runner.data?.id}</h1>
-              {runner.data && <RunnerStateBadge state={runner.data.state!} />}
+              <RunnerStateBadge state={runner.data.state!} />
             </div>
             <div className="text-sm text-gray-11">
               {runner.data.organization} / {runner.data.runner_group}
@@ -185,7 +185,9 @@ function RouteComponent() {
                     </div>
 
                     <Button className="ml-auto" asChild variant="outline">
-                      <Link to={`/jobs`}>View details</Link>
+                      <Link to="/jobs/$id" params={{ id: job.id! }}>
+                        View details
+                      </Link>
                     </Button>
                   </div>
                 </Card>
@@ -193,7 +195,7 @@ function RouteComponent() {
             })}
           </div>
         ) : (
-          <div className="h-72 w-full animate-pulse rounded-md bg-gray-2" />
+          <div className="h-[74px] w-full animate-pulse rounded-md bg-gray-2" />
         )}
       </div>
 

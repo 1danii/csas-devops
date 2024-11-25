@@ -15,6 +15,7 @@ import { Route as IndexImport } from './routes/index'
 import { Route as RunnersIndexImport } from './routes/runners/index'
 import { Route as JobsIndexImport } from './routes/jobs/index'
 import { Route as RunnersIdImport } from './routes/runners/$id'
+import { Route as JobsIdImport } from './routes/jobs/$id'
 
 // Create/Update Routes
 
@@ -42,6 +43,12 @@ const RunnersIdRoute = RunnersIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const JobsIdRoute = JobsIdImport.update({
+  id: '/jobs/$id',
+  path: '/jobs/$id',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -51,6 +58,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/jobs/$id': {
+      id: '/jobs/$id'
+      path: '/jobs/$id'
+      fullPath: '/jobs/$id'
+      preLoaderRoute: typeof JobsIdImport
       parentRoute: typeof rootRoute
     }
     '/runners/$id': {
@@ -81,6 +95,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/runners/$id': typeof RunnersIdRoute
   '/jobs': typeof JobsIndexRoute
   '/runners': typeof RunnersIndexRoute
@@ -88,6 +103,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/runners/$id': typeof RunnersIdRoute
   '/jobs': typeof JobsIndexRoute
   '/runners': typeof RunnersIndexRoute
@@ -96,6 +112,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/runners/$id': typeof RunnersIdRoute
   '/jobs/': typeof JobsIndexRoute
   '/runners/': typeof RunnersIndexRoute
@@ -103,15 +120,16 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/runners/$id' | '/jobs' | '/runners'
+  fullPaths: '/' | '/jobs/$id' | '/runners/$id' | '/jobs' | '/runners'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/runners/$id' | '/jobs' | '/runners'
-  id: '__root__' | '/' | '/runners/$id' | '/jobs/' | '/runners/'
+  to: '/' | '/jobs/$id' | '/runners/$id' | '/jobs' | '/runners'
+  id: '__root__' | '/' | '/jobs/$id' | '/runners/$id' | '/jobs/' | '/runners/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  JobsIdRoute: typeof JobsIdRoute
   RunnersIdRoute: typeof RunnersIdRoute
   JobsIndexRoute: typeof JobsIndexRoute
   RunnersIndexRoute: typeof RunnersIndexRoute
@@ -119,6 +137,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  JobsIdRoute: JobsIdRoute,
   RunnersIdRoute: RunnersIdRoute,
   JobsIndexRoute: JobsIndexRoute,
   RunnersIndexRoute: RunnersIndexRoute,
@@ -135,6 +154,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/jobs/$id",
         "/runners/$id",
         "/jobs/",
         "/runners/"
@@ -142,6 +162,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/jobs/$id": {
+      "filePath": "jobs/$id.tsx"
     },
     "/runners/$id": {
       "filePath": "runners/$id.tsx"

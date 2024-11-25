@@ -57,7 +57,7 @@
   --blue-a11: #0050d8e3;
   --blue-a12: #002059ed;
 
-  --color-primary: #fdfdfd;
+  --primary: #fdfdfd;
 }
 
 @supports (color: color(display-p3 1 1 1)) {

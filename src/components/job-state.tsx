@@ -49,3 +49,24 @@ export function JobStateDot({
     </div>
   );
 }
+
+const badgeVariants = {
+  success: "border-green-7 bg-green-a3 text-green-9",
+  in_progress: "border-yellow-7 bg-yellow-a3 text-yellow-9",
+  queued: "border-blue-7 bg-blue-a3 text-blue-9",
+  failed: "border-red-7 bg-red-a3 text-red-9",
+} satisfies Record<JobState, string>;
+
+export function JobStateBadge({ state }: { state: JobState }) {
+  return (
+    <div
+      className={cn(
+        "inline-flex h-6 items-center rounded-md border px-3 text-xs font-semibold uppercase",
+        badgeVariants[state],
+      )}
+    >
+      <JobStateDot className="mr-1 size-1.5" state={state} />
+      {state}
+    </div>
+  );
+}

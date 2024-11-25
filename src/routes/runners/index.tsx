@@ -1,3 +1,17 @@
+import { JobStateDot } from "@/components/job-state";
+import { RunnerStateDot } from "@/components/runner-state";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFilter,
+  TableHead,
+  TableHeader,
+  TableHeaderSortable,
+  TablePagination,
+  TableRow,
+  TableRowLink,
+} from "@/components/ui/table";
 import { api } from "@/lib/api";
 import { createFileRoute } from "@tanstack/react-router";
 import {
@@ -9,6 +23,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { DateTime } from "luxon";
+import { useMemo } from "react";
 import { type components } from "schema";
 
 export const Route = createFileRoute("/runners/")({
@@ -112,23 +128,6 @@ const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
   //     })(),
   // },
 ];
-
-import { JobStateDot } from "@/components/job-state";
-import { RunnerStateDot } from "@/components/runner-state";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFilter,
-  TableHead,
-  TableHeader,
-  TableHeaderSortable,
-  TablePagination,
-  TableRow,
-  TableRowLink,
-} from "@/components/ui/table";
-import { DateTime } from "luxon";
-import { useMemo } from "react";
 
 export function DataTable() {
   const { data, isLoading } = api.useQuery("get", "/runners");
