@@ -1,24 +1,28 @@
 import { JobStateBadge, JobStateDot } from "@/components/job-state";
 import { Card } from "@/components/ui/card";
 import { api } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Background,
   Handle,
-  Node,
-  NodeProps,
+  type Node,
+  type NodeProps,
   Position,
   ReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { GitCommitHorizontalIcon } from "lucide-react";
-import { DateObjectUnits, DateTime } from "luxon";
-import { CSSProperties, memo } from "react";
-import { components } from "schema";
+import { type DateObjectUnits, DateTime } from "luxon";
+import { type CSSProperties, memo } from "react";
+import { type components } from "schema";
 
 export const Route = createFileRoute("/jobs/$id")({
   component: RouteComponent,
+  loader: ({ context: { queryClient }, params: { id } }) => {
+    void queryClient.ensureQueryData(jobQueryOptions(id));
+  },
 });
 
 type JobNode = Node<{
@@ -141,6 +145,7 @@ const jobQueryOptions = (id: string) =>
 function RouteComponent() {
   const { id } = Route.useParams();
   const job = useQuery(jobQueryOptions(id));
+
   return (
     <div>
       <span className="text-sm font-medium text-gray-11">Job</span>
@@ -178,6 +183,13 @@ function RouteComponent() {
               </div>
             </div>
             <div className="ml-48 flex flex-col">
+              <div className="text-xs font-medium text-gray-11">Tasks</div>
+              <div className="flex items-center text-base font-medium">
+                <span className="mr-2">2/4</span>
+                <JobStateDot state={job.data.state!} />
+              </div>
+            </div>
+            <div className="ml-48 flex flex-col">
               <div className="text-xs font-medium text-gray-11">
                 Triggered by
               </div>
@@ -192,6 +204,25 @@ function RouteComponent() {
               </div>
               <div className="flex items-center text-base font-medium">
                 {job.data.organization!}
+              </div>
+            </div>
+            <div className="ml-auto flex flex-col">
+              <div className="text-xs font-medium text-gray-11">
+                Run history
+              </div>
+              <div className="flex items-center gap-x-0.5">
+                {Array.from({ length: 30 }).map((_, i) => {
+                  const failedIdx = [2, 3, 4, 5, 16];
+                  return (
+                    <div
+                      key={i}
+                      className={cn(
+                        "h-6 w-1.5 rounded-sm",
+                        failedIdx.includes(i) ? "bg-red-9" : "bg-green-9",
+                      )}
+                    />
+                  );
+                })}
               </div>
             </div>
           </Card>

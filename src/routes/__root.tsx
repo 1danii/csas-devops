@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import "@/index.css";
+import * as Collapsible from "@radix-ui/react-collapsible";
 import { type QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
@@ -8,7 +9,12 @@ import {
   Outlet,
   createRootRouteWithContext,
 } from "@tanstack/react-router";
-import { CloudCogIcon, ServerCogIcon } from "lucide-react";
+import {
+  ChartBar,
+  ChevronDownIcon,
+  CloudCogIcon,
+  ServerCogIcon,
+} from "lucide-react";
 import * as React from "react";
 
 const TanStackRouterDevtools =
@@ -39,11 +45,12 @@ function NavButton({
     <Button
       asChild
       variant="ghost"
-      className="group justify-start text-left text-gray-11 data-[active=true]:bg-gray-4 data-[active=true]:text-gray-12"
+      className="group justify-start text-left text-gray-11 data-[active=true]:bg-blue-a4 data-[active=true]:text-blue-12"
     >
       <Link
         {...props}
         data-active={false}
+        activeOptions={{ exact: true }}
         activeProps={{ "data-active": true }}
       >
         {children}
@@ -52,12 +59,45 @@ function NavButton({
   );
 }
 
+function NavButtonCollapsible({
+  children,
+  links,
+  ...props
+}: React.ComponentProps<"button"> & {
+  links: (LinkComponentProps & { label: string })[];
+}) {
+  return (
+    <Collapsible.Root>
+      <Collapsible.Trigger asChild>
+        <Button
+          variant="ghost"
+          className="group w-full justify-start text-left text-gray-11 data-[active=true]:bg-blue-a4 data-[active=true]:text-blue-12"
+          {...props}
+        >
+          {children}
+          <ChevronDownIcon className="ml-auto duration-150 ease-in-out group-data-[state=closed]:-rotate-90" />
+        </Button>
+      </Collapsible.Trigger>
+      <Collapsible.Content className="ml-4 flex flex-col border-l pl-2 data-[state=open]:pt-1">
+        {links.map(({ label, ...props }, i) => (
+          <NavButton key={i} {...props}>
+            {label}
+          </NavButton>
+        ))}
+      </Collapsible.Content>
+    </Collapsible.Root>
+  );
+}
+
 function RootComponent() {
   return (
     <>
       <main className="flex h-screen overflow-hidden">
         <div className="w-60 shrink-0 border-r">
-          <nav className="flex flex-col gap-y-1 px-4 py-6">
+          <div className="flex h-12 items-center px-4 text-xl font-semibold">
+            DOPO
+          </div>
+          <nav className="flex flex-col px-4 py-2">
             <NavButton to="/runners">
               <ServerCogIcon className="group-data-[active=true]:text-blue-9" />
               Runners
@@ -66,6 +106,11 @@ function RootComponent() {
               <CloudCogIcon className="group-data-[active=true]:text-blue-9" />
               Jobs
             </NavButton>
+            <NavButtonCollapsible
+              links={[{ label: "Runners", to: "/runners/stats" }]}
+            >
+              <ChartBar /> Metrics
+            </NavButtonCollapsible>
           </nav>
         </div>
         <div className="flex flex-1 flex-col">

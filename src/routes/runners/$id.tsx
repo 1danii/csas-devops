@@ -8,47 +8,24 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { api } from "@/lib/api";
 import { formatMemory } from "@/lib/utils";
-import {
-  queryOptions,
-  useQuery,
-  type UseQueryResult,
-} from "@tanstack/react-query";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowDownIcon,
   ArrowDownUpIcon,
   ArrowUpIcon,
-  ChevronUp,
   CpuIcon,
   EyeIcon,
   GitCommitHorizontalIcon,
   HardDriveIcon,
-  HardDriveUploadIcon,
   MemoryStickIcon,
   PenLineIcon,
 } from "lucide-react";
 import { DateTime } from "luxon";
-import { useState, type PropsWithChildren } from "react";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { type PropsWithChildren } from "react";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { type components } from "schema";
 
 const runnerQueryOptions = (id: string) =>
@@ -285,7 +262,7 @@ function Chart({
     >
       {/* @ts-expect-error margin type */}
       <AreaChart margin={0} accessibilityLayer data={chartData}>
-        <ChartTooltip content={<ChartTooltipContent />} />
+        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
         <CartesianGrid strokeDasharray={2} vertical={false} />
         <XAxis
           tickLine={false}
