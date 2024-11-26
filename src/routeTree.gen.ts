@@ -12,7 +12,6 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as SasIndexImport } from './routes/sas/index'
 import { Route as RunnersIndexImport } from './routes/runners/index'
 import { Route as JobsIndexImport } from './routes/jobs/index'
 import { Route as AutomationsIndexImport } from './routes/automations/index'
@@ -27,12 +26,6 @@ import { Route as JobsIdImport } from './routes/jobs/$id'
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const SasIndexRoute = SasIndexImport.update({
-  id: '/sas/',
-  path: '/sas/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -151,13 +144,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RunnersIndexImport
       parentRoute: typeof rootRoute
     }
-    '/sas/': {
-      id: '/sas/'
-      path: '/sas'
-      fullPath: '/sas'
-      preLoaderRoute: typeof SasIndexImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -173,7 +159,6 @@ export interface FileRoutesByFullPath {
   '/automations': typeof AutomationsIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/runners': typeof RunnersIndexRoute
-  '/sas': typeof SasIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -186,7 +171,6 @@ export interface FileRoutesByTo {
   '/automations': typeof AutomationsIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/runners': typeof RunnersIndexRoute
-  '/sas': typeof SasIndexRoute
 }
 
 export interface FileRoutesById {
@@ -200,7 +184,6 @@ export interface FileRoutesById {
   '/automations/': typeof AutomationsIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/runners/': typeof RunnersIndexRoute
-  '/sas/': typeof SasIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -215,7 +198,6 @@ export interface FileRouteTypes {
     | '/automations'
     | '/jobs'
     | '/runners'
-    | '/sas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -227,7 +209,6 @@ export interface FileRouteTypes {
     | '/automations'
     | '/jobs'
     | '/runners'
-    | '/sas'
   id:
     | '__root__'
     | '/'
@@ -239,7 +220,6 @@ export interface FileRouteTypes {
     | '/automations/'
     | '/jobs/'
     | '/runners/'
-    | '/sas/'
   fileRoutesById: FileRoutesById
 }
 
@@ -253,7 +233,6 @@ export interface RootRouteChildren {
   AutomationsIndexRoute: typeof AutomationsIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
   RunnersIndexRoute: typeof RunnersIndexRoute
-  SasIndexRoute: typeof SasIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -266,7 +245,6 @@ const rootRouteChildren: RootRouteChildren = {
   AutomationsIndexRoute: AutomationsIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
   RunnersIndexRoute: RunnersIndexRoute,
-  SasIndexRoute: SasIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -287,8 +265,7 @@ export const routeTree = rootRoute
         "/sas/$id",
         "/automations/",
         "/jobs/",
-        "/runners/",
-        "/sas/"
+        "/runners/"
       ]
     },
     "/": {
@@ -317,9 +294,6 @@ export const routeTree = rootRoute
     },
     "/runners/": {
       "filePath": "runners/index.tsx"
-    },
-    "/sas/": {
-      "filePath": "sas/index.tsx"
     }
   }
 }

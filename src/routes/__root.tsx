@@ -101,7 +101,7 @@ function RootComponent() {
             DOPO
           </div>
           <nav className="flex flex-col px-4 py-2">
-            <NavButton to="/sas">
+            <NavButton to="/">
               <Layers3Icon className="group-data-[active=true]:text-blue-9" />
               SAS Directory
             </NavButton>

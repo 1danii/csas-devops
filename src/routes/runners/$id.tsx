@@ -89,32 +89,32 @@ function RouteComponent() {
           <>
             <Metric icon={<CpuIcon />} title="CPU load">
               <div className="text-2xl font-semibold">
-                {(latestMetrics.cpu! * 100).toFixed(0)}%
+                {(Number(latestMetrics.cpu!) * 100).toFixed(0)}%
               </div>
             </Metric>
             <Metric icon={<MemoryStickIcon />} title="Memory used">
               <div className="text-2xl font-semibold">
-                {formatMemory(latestMetrics.memory!)} / 4 GB
+                {formatMemory(Number(latestMetrics.memory!))} / 4 GB
               </div>
             </Metric>
             <Metric icon={<ArrowDownUpIcon />} title="Network">
               <div className="flex items-center text-sm/none font-semibold">
                 <ArrowUpIcon className="mr-2 size-4" />
-                {formatMemory(latestMetrics.network_transmit!)}/s
+                {formatMemory(Number(latestMetrics.network_transmit!))}/s
               </div>
               <div className="flex items-center text-sm/none font-semibold">
                 <ArrowDownIcon className="mr-2 size-4" />
-                {formatMemory(latestMetrics.network_receive!)}/s
+                {formatMemory(Number(latestMetrics.network_receive!))}/s
               </div>
             </Metric>
             <Metric icon={<HardDriveIcon />} title="Disk">
               <div className="flex items-center text-sm/none font-semibold">
                 <EyeIcon className="mr-2 size-4" />
-                {formatMemory(latestMetrics.fs_reads!)}/s
+                {formatMemory(Number(latestMetrics.fs_reads!))}/s
               </div>
               <div className="flex items-center text-sm/none font-semibold">
                 <PenLineIcon className="mr-2 size-4" />
-                {formatMemory(latestMetrics.fs_writes!)}/s
+                {formatMemory(Number(latestMetrics.fs_writes!))}/s
               </div>
             </Metric>
           </>
