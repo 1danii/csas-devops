@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export function formatMemory(bytes: number) {
   if (bytes < 1024) {
     // Less than 1 KB, keep in bytes
-    return `${bytes} B`;
+    return `${bytes.toFixed(0)} B`;
   } else if (bytes < 1024 ** 2) {
     // Convert to KB
     return `${(bytes / 1024).toFixed(0)} KB`;

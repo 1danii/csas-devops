@@ -131,9 +131,11 @@ function RouteComponent() {
       </div>
 
       <div className="flex flex-col pt-4">
-        <span className="pb-2 text-sm font-medium text-gray-11">
-          Assigned jobs
-        </span>
+        {jobs.data && jobs.data.length > 0 && (
+          <span className="pb-2 text-sm font-medium text-gray-11">
+            Assigned jobs
+          </span>
+        )}
 
         {jobs.data ? (
           <div className="flex flex-col gap-y-4">
@@ -172,7 +174,7 @@ function RouteComponent() {
             })}
           </div>
         ) : (
-          <div className="h-[74px] w-full animate-pulse rounded-md bg-gray-2" />
+          <div className="h-[102px] w-full animate-pulse rounded-md bg-gray-2" />
         )}
       </div>
 

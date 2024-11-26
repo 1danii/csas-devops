@@ -12,12 +12,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
+import { formatMemory } from "@/lib/utils";
+import { UseQueryResult } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   Area,
   AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
+  LabelList,
   Pie,
   PieChart,
   XAxis,
@@ -48,17 +53,102 @@ const stateColors: Record<components["schemas"]["RunnerState"], string> = {
 
 function RouteComponent() {
   const runners = api.useQuery("get", "/runners");
+  const jobs = api.useQuery("get", "/jobs");
+  const metrics = api.useQuery("get", "/metrics") as UseQueryResult<
+    {
+      runner: string;
+      metrics: components["schemas"]["Metric"][];
+    }[]
+  >;
+
   const [selectedChart, setSelectedChart] =
     useState<components["schemas"]["RunnerState"]>("active");
+  const [selectedMetricChart, setSelectedMetricChart] =
+    useState<keyof components["schemas"]["Metric"]>("cpu");
+
+  const SASMetricsData = useMemo(() => {
+    if (!metrics.data || !jobs.data) return;
+
+    const SAS = [
+      ...new Set(
+        jobs.data
+          .map((job) => job.SAS)
+          .filter((sas): sas is string => sas != null),
+      ),
+    ];
+
+    return SAS.map((sas) => {
+      const sasJobs = jobs.data.filter((job) => job.SAS === sas);
+      const sasRunnerIds = sasJobs
+        .map((job) => job.runner)
+        .filter((id): id is string => id != null);
+
+      // Filter out runners that are offline
+      const activeRunnerIds = sasRunnerIds.filter((runnerId) => {
+        const runner = runners.data?.find((r) => r.id === runnerId);
+        return runner && runner.state !== "offline";
+      });
+
+      const sasRunnerMetrics = activeRunnerIds.reduce(
+        (acc, runnerId) => {
+          const runnerData = metrics.data.find((m) => m.runner === runnerId);
+          if (!runnerData?.metrics.length) return acc;
+          const metric = runnerData.metrics[0]!;
+
+          return {
+            cpu: Number(
+              (Number(acc.cpu ?? 0) + Number(metric.cpu ?? 0)) /
+                activeRunnerIds.length,
+            ),
+            memory:
+              (Number(acc.memory ?? 0) + Number(metric.memory ?? 0)) /
+              activeRunnerIds.length,
+            network_receive:
+              (Number(acc.network_receive ?? 0) +
+                Number(metric.network_receive ?? 0)) /
+              activeRunnerIds.length,
+            network_transmit:
+              (Number(acc.network_transmit ?? 0) +
+                Number(metric.network_transmit ?? 0)) /
+              activeRunnerIds.length,
+            fs_reads:
+              (Number(acc.fs_reads ?? 0) + Number(metric.fs_reads ?? 0)) /
+              activeRunnerIds.length,
+            fs_writes:
+              (Number(acc.fs_writes ?? 0) + Number(metric.fs_writes ?? 0)) /
+              activeRunnerIds.length,
+          };
+        },
+        {} as components["schemas"]["Metric"],
+      );
+
+      if (Object.keys(sasRunnerMetrics).length === 0) {
+        return;
+      }
+
+      return {
+        sas: sas,
+        ...sasRunnerMetrics,
+      };
+    })
+      .filter((sas) => sas !== undefined)
+      .sort((a, b) => {
+        if (!a || !b) return 0;
+        return b[selectedMetricChart]! - a[selectedMetricChart]!;
+      });
+  }, [metrics.data, selectedMetricChart]);
+  console.log(SASMetricsData);
 
   const runnerData = useMemo(() => {
     if (!runners.data) return;
-    return runnerStates.map((state) => ({
-      count:
-        runners.data?.filter((runner) => runner.state === state).length ?? 0,
-      state: state,
-      fill: stateColors[state],
-    }));
+    return runnerStates
+      .filter((state) => state !== "offline")
+      .map((state) => ({
+        count:
+          runners.data?.filter((runner) => runner.state === state).length ?? 0,
+        state: state,
+        fill: stateColors[state],
+      }));
   }, [runners.data]);
 
   const runnerDataTime = useMemo(() => {
@@ -90,28 +180,31 @@ function RouteComponent() {
 
   return (
     <div>
-      <h1 className="pb-4 text-3xl font-semibold">Runner metrics</h1>
+      <h1 className="pb-4 text-3xl font-semibold">Runner stats</h1>
 
       <div className="flex gap-4">
         <>
           <div className="flex-1">
-            <Select
-              value={selectedChart}
-              onValueChange={(v: components["schemas"]["RunnerState"]) =>
-                setSelectedChart(v)
-              }
-            >
-              <SelectTrigger className="mb-2">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {runnerStates.map((state, i) => (
-                  <SelectItem key={i} value={state}>
-                    {state}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center">
+              <h2 className="mb-3 text-xl font-semibold">Runners by state</h2>
+              <Select
+                value={selectedChart}
+                onValueChange={(v: components["schemas"]["RunnerState"]) =>
+                  setSelectedChart(v)
+                }
+              >
+                <SelectTrigger className="mb-2 ml-auto">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {runnerStates.map((state, i) => (
+                    <SelectItem key={i} value={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             {runnerDataTime ? (
               <ChartContainer
                 config={{} satisfies ChartConfig}
@@ -187,7 +280,11 @@ function RouteComponent() {
               >
                 <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col justify-center text-center">
                   <span className="text-4xl font-semibold">
-                    {runners.data.length}
+                    {
+                      runners.data.filter(
+                        (runner) => runner.state !== "offline",
+                      ).length
+                    }
                   </span>
                   <span className="text-sm font-medium text-gray-11">
                     Runners
@@ -210,6 +307,83 @@ function RouteComponent() {
             )}
           </div>
         </>
+      </div>
+
+      <div className="pt-4">
+        <div className="flex items-center">
+          <h2 className="mb-3 text-xl font-semibold">Average metrics by SAS</h2>
+          <Select
+            value={selectedMetricChart}
+            onValueChange={(v: keyof components["schemas"]["Metric"]) =>
+              setSelectedMetricChart(v)
+            }
+          >
+            <SelectTrigger className="mb-2 ml-auto">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(
+                [
+                  "cpu",
+                  "memory",
+                  "network_receive",
+                  "network_transmit",
+                  "fs_reads",
+                  "fs_writes",
+                ] as (keyof components["schemas"]["Metric"])[]
+              ).map((metric, i) => (
+                <SelectItem key={i} value={metric}>
+                  {metric}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {SASMetricsData ? (
+          <ChartContainer
+            config={{} satisfies ChartConfig}
+            className="max-h-80 w-full"
+          >
+            {/* @ts-expect-error margin type */}
+            <BarChart margin={0} accessibilityLayer data={SASMetricsData}>
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <CartesianGrid strokeDasharray={2} vertical={false} />
+              <XAxis
+                className="hidden"
+                interval={0}
+                dataKey="sas"
+                tickLine={false}
+                axisLine={false}
+                minTickGap={0}
+              />
+              <YAxis
+                dataKey={selectedMetricChart}
+                spacing={10}
+                tickLine={false}
+                tickMargin={20}
+                axisLine={false}
+              />
+
+              <Bar
+                dataKey={selectedMetricChart}
+                stackId="a"
+                fill="var(--blue-9)"
+              >
+                <LabelList
+                  fontSize={8}
+                  formatter={(v: number) =>
+                    selectedMetricChart === "cpu" ? v : formatMemory(v)
+                  }
+                  dataKey={selectedMetricChart}
+                  position="top"
+                  offset={6}
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
+        ) : (
+          <div className="size-full max-h-80 animate-pulse rounded-md bg-gray-2" />
+        )}
       </div>
     </div>
   );

@@ -104,29 +104,29 @@ const columns: ColumnDef<components["schemas"]["Runner"]>[] = [
       }
     },
   },
-  // {
-  //   accessorKey: "",
-  //   header: "Current job",
+  {
+    accessorKey: "",
+    header: "Current job",
 
-  //   cell: ({ row }) =>
-  //     (() => {
-  //       const percentagePoints = [
-  //         0.7, 0.6, 0.55, 0.6, 0.75, 0.8, 0.9, 0.85, 0.7, 0.6, 0.5, 0.4,
-  //       ];
-  //       const pathData = percentagePoints
-  //         .map(
-  //           (y, i) =>
-  //             `${i === 0 ? "M" : "L"}${(i * 128) / (percentagePoints.length - 1)} ${32 - y * 32}`,
-  //         )
-  //         .join(" ");
+    cell: ({ row }) =>
+      (() => {
+        const percentagePoints = [
+          0.7, 0.6, 0.55, 0.6, 0.75, 0.8, 0.9, 0.85, 0.7, 0.6, 0.5, 0.4,
+        ];
+        const pathData = percentagePoints
+          .map(
+            (y, i) =>
+              `${i === 0 ? "M" : "L"}${(i * 128) / (percentagePoints.length - 1)} ${32 - y * 32}`,
+          )
+          .join(" ");
 
-  //       return (
-  //         <svg className="h-8 w-32 stroke-blue-9">
-  //           <path d={pathData} fill="none" strokeWidth="1" />
-  //         </svg>
-  //       );
-  //     })(),
-  // },
+        return (
+          <svg className="h-8 w-32 stroke-blue-9">
+            <path d={pathData} fill="none" strokeWidth="1" />
+          </svg>
+        );
+      })(),
+  },
 ];
 
 function DataTable() {

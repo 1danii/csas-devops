@@ -58,7 +58,12 @@ function RouteComponent() {
       ...new Set(
         jobs.data
           .map((job) => job.SAS)
-          .filter((sas): sas is string => sas != null),
+          .filter((sas): sas is string => sas != null)
+          .sort((a, b) => {
+            const countA = jobs.data.filter((job) => job.SAS === a).length;
+            const countB = jobs.data.filter((job) => job.SAS === b).length;
+            return countB - countA;
+          }),
       ),
     ];
 
@@ -92,6 +97,7 @@ function RouteComponent() {
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <CartesianGrid strokeDasharray={2} vertical={false} />
                 <XAxis
+                  className="hidden"
                   interval={0}
                   dataKey="sas"
                   fontSize={6}
@@ -109,7 +115,12 @@ function RouteComponent() {
 
                 {jobStates.map((state, i) => {
                   return (
-                    <Bar dataKey={state} stackId="a" fill={stateColors[state]}>
+                    <Bar
+                      key={i}
+                      dataKey={state}
+                      stackId="a"
+                      fill={stateColors[state]}
+                    >
                       {i === jobStates.length - 1 && (
                         <LabelList
                           dataKey="count"

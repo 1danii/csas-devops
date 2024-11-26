@@ -164,8 +164,8 @@ function SASCard({
   const isFavorite = favorites.includes(id);
 
   return (
-    <Link>
-      <Card className="h-36 border p-4">
+    <Link to="/sas/$id" params={{ id }}>
+      <Card className="border p-4">
         <div className="flex">
           <div className="flex aspect-square size-16 items-center justify-center rounded-md border border-blue-6 bg-blue-2 p-3 text-blue-9">
             <GlobeIcon className="size-8" />

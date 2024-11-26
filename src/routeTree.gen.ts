@@ -16,6 +16,7 @@ import { Route as SasIndexImport } from './routes/sas/index'
 import { Route as RunnersIndexImport } from './routes/runners/index'
 import { Route as JobsIndexImport } from './routes/jobs/index'
 import { Route as AutomationsIndexImport } from './routes/automations/index'
+import { Route as SasIdImport } from './routes/sas/$id'
 import { Route as RunnersStatsImport } from './routes/runners/stats'
 import { Route as RunnersIdImport } from './routes/runners/$id'
 import { Route as JobsStatsImport } from './routes/jobs/stats'
@@ -50,6 +51,12 @@ const JobsIndexRoute = JobsIndexImport.update({
 const AutomationsIndexRoute = AutomationsIndexImport.update({
   id: '/automations/',
   path: '/automations/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SasIdRoute = SasIdImport.update({
+  id: '/sas/$id',
+  path: '/sas/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -116,6 +123,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RunnersStatsImport
       parentRoute: typeof rootRoute
     }
+    '/sas/$id': {
+      id: '/sas/$id'
+      path: '/sas/$id'
+      fullPath: '/sas/$id'
+      preLoaderRoute: typeof SasIdImport
+      parentRoute: typeof rootRoute
+    }
     '/automations/': {
       id: '/automations/'
       path: '/automations'
@@ -155,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/jobs/stats': typeof JobsStatsRoute
   '/runners/$id': typeof RunnersIdRoute
   '/runners/stats': typeof RunnersStatsRoute
+  '/sas/$id': typeof SasIdRoute
   '/automations': typeof AutomationsIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/runners': typeof RunnersIndexRoute
@@ -167,6 +182,7 @@ export interface FileRoutesByTo {
   '/jobs/stats': typeof JobsStatsRoute
   '/runners/$id': typeof RunnersIdRoute
   '/runners/stats': typeof RunnersStatsRoute
+  '/sas/$id': typeof SasIdRoute
   '/automations': typeof AutomationsIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/runners': typeof RunnersIndexRoute
@@ -180,6 +196,7 @@ export interface FileRoutesById {
   '/jobs/stats': typeof JobsStatsRoute
   '/runners/$id': typeof RunnersIdRoute
   '/runners/stats': typeof RunnersStatsRoute
+  '/sas/$id': typeof SasIdRoute
   '/automations/': typeof AutomationsIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/runners/': typeof RunnersIndexRoute
@@ -194,6 +211,7 @@ export interface FileRouteTypes {
     | '/jobs/stats'
     | '/runners/$id'
     | '/runners/stats'
+    | '/sas/$id'
     | '/automations'
     | '/jobs'
     | '/runners'
@@ -205,6 +223,7 @@ export interface FileRouteTypes {
     | '/jobs/stats'
     | '/runners/$id'
     | '/runners/stats'
+    | '/sas/$id'
     | '/automations'
     | '/jobs'
     | '/runners'
@@ -216,6 +235,7 @@ export interface FileRouteTypes {
     | '/jobs/stats'
     | '/runners/$id'
     | '/runners/stats'
+    | '/sas/$id'
     | '/automations/'
     | '/jobs/'
     | '/runners/'
@@ -229,6 +249,7 @@ export interface RootRouteChildren {
   JobsStatsRoute: typeof JobsStatsRoute
   RunnersIdRoute: typeof RunnersIdRoute
   RunnersStatsRoute: typeof RunnersStatsRoute
+  SasIdRoute: typeof SasIdRoute
   AutomationsIndexRoute: typeof AutomationsIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
   RunnersIndexRoute: typeof RunnersIndexRoute
@@ -241,6 +262,7 @@ const rootRouteChildren: RootRouteChildren = {
   JobsStatsRoute: JobsStatsRoute,
   RunnersIdRoute: RunnersIdRoute,
   RunnersStatsRoute: RunnersStatsRoute,
+  SasIdRoute: SasIdRoute,
   AutomationsIndexRoute: AutomationsIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
   RunnersIndexRoute: RunnersIndexRoute,
@@ -262,6 +284,7 @@ export const routeTree = rootRoute
         "/jobs/stats",
         "/runners/$id",
         "/runners/stats",
+        "/sas/$id",
         "/automations/",
         "/jobs/",
         "/runners/",
@@ -282,6 +305,9 @@ export const routeTree = rootRoute
     },
     "/runners/stats": {
       "filePath": "runners/stats.tsx"
+    },
+    "/sas/$id": {
+      "filePath": "sas/$id.tsx"
     },
     "/automations/": {
       "filePath": "automations/index.tsx"
