@@ -1,10 +1,12 @@
 import { JobStateBadge, JobStateDot } from "@/components/job-state";
+import { RunnerStateDot } from "@/components/runner-state";
 import { useTheme } from "@/components/theme-provider";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Background,
   Handle,
@@ -149,13 +151,22 @@ function RouteComponent() {
   const { theme } = useTheme();
   const { id } = Route.useParams();
   const job = useQuery(jobQueryOptions(id));
+  const runner = api.useQuery(
+    "get",
+    "/runners/{id}",
+    {
+      // @ts-expect-error params
+      params: { path: { id: job.data?.runner } },
+    },
+    { enabled: job.data?.runner === "none" ? false : true },
+  );
 
   return (
     <div>
-      <span className="text-sm font-medium text-gray-11">Job</span>
-      <div className="pb-4">
+      <div>
         {job.data ? (
           <>
+            <span className="pb-4 text-sm font-medium text-gray-11">Job</span>
             <div className="flex items-center">
               <h1 className="mr-2 text-3xl font-semibold">{job.data.id}</h1>
               <JobStateBadge state={job.data.state!} />
@@ -167,6 +178,33 @@ function RouteComponent() {
             <div className="h-8 w-[580px] animate-pulse rounded-md bg-gray-2" />
             <div className="mt-2 h-4 w-52 animate-pulse rounded-md bg-gray-2" />
           </>
+        )}
+      </div>
+
+      <div className="flex flex-col pt-4">
+        {!runner.isLoading ? (
+          runner.data ? (
+            <div className="pb-4">
+              <span className="pb-2 text-sm font-medium text-gray-11">
+                Assigned runner
+              </span>
+              <div className="flex flex-col gap-y-4">
+                <Card key={runner.data.id} className="flex items-center p-4">
+                  <RunnerStateDot className="mr-4" state={runner.data.state!} />
+                  <div className="text-base font-semibold">
+                    {runner.data.id}
+                  </div>
+                  <Button className="ml-auto" asChild variant="outline">
+                    <Link to="/runners/$id" params={{ id: runner.data.id! }}>
+                      View details
+                    </Link>
+                  </Button>
+                </Card>
+              </div>
+            </div>
+          ) : null
+        ) : (
+          <div className="h-[102px] w-full animate-pulse rounded-md bg-gray-2" />
         )}
       </div>
 

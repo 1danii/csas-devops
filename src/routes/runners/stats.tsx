@@ -372,7 +372,9 @@ function RouteComponent() {
                 <LabelList
                   fontSize={8}
                   formatter={(v: number) =>
-                    selectedMetricChart === "cpu" ? v : formatMemory(v)
+                    selectedMetricChart === "cpu"
+                      ? v.toFixed(2)
+                      : formatMemory(v)
                   }
                   dataKey={selectedMetricChart}
                   position="top"

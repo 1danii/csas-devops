@@ -97,9 +97,14 @@ function RootComponent() {
     <>
       <main className="flex h-screen overflow-hidden">
         <div className="flex w-60 shrink-0 flex-col border-r">
-          <div className="flex h-12 items-center px-4 text-xl font-semibold">
-            DOPO
-          </div>
+          <Link to="/">
+            <img
+              src="/dopo.svg"
+              className="h-12 w-auto object-contain px-4 py-2"
+              alt=""
+            />
+          </Link>
+
           <nav className="flex flex-col px-4 py-2">
             <NavButton to="/">
               <Layers3Icon className="group-data-[active=true]:text-blue-9" />
