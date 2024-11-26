@@ -118,7 +118,10 @@ function RootComponent() {
               Automations
             </NavButton>
             <NavButtonCollapsible
-              links={[{ label: "Runners", to: "/runners/stats" }]}
+              links={[
+                { label: "Runners", to: "/runners/stats" },
+                { label: "Jobs", to: "/jobs/stats" },
+              ]}
             >
               <ChartBar /> Metrics
             </NavButtonCollapsible>

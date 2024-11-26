@@ -90,7 +90,7 @@ function RouteComponent() {
 
   return (
     <div>
-      <h1 className="pb-4 text-3xl font-semibold">Runner stats</h1>
+      <h1 className="pb-4 text-3xl font-semibold">Runner metrics</h1>
 
       <div className="flex gap-4">
         <>
@@ -196,6 +196,7 @@ function RouteComponent() {
                 <PieChart accessibilityLayer data={runnerData}>
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                   <Pie
+                    strokeWidth={0}
                     data={runnerData}
                     innerRadius={90}
                     outerRadius={140}

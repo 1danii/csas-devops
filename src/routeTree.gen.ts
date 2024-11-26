@@ -18,6 +18,7 @@ import { Route as JobsIndexImport } from './routes/jobs/index'
 import { Route as AutomationsIndexImport } from './routes/automations/index'
 import { Route as RunnersStatsImport } from './routes/runners/stats'
 import { Route as RunnersIdImport } from './routes/runners/$id'
+import { Route as JobsStatsImport } from './routes/jobs/stats'
 import { Route as JobsIdImport } from './routes/jobs/$id'
 
 // Create/Update Routes
@@ -64,6 +65,12 @@ const RunnersIdRoute = RunnersIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const JobsStatsRoute = JobsStatsImport.update({
+  id: '/jobs/stats',
+  path: '/jobs/stats',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const JobsIdRoute = JobsIdImport.update({
   id: '/jobs/$id',
   path: '/jobs/$id',
@@ -86,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/jobs/$id'
       fullPath: '/jobs/$id'
       preLoaderRoute: typeof JobsIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/jobs/stats': {
+      id: '/jobs/stats'
+      path: '/jobs/stats'
+      fullPath: '/jobs/stats'
+      preLoaderRoute: typeof JobsStatsImport
       parentRoute: typeof rootRoute
     }
     '/runners/$id': {
@@ -138,6 +152,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/jobs/$id': typeof JobsIdRoute
+  '/jobs/stats': typeof JobsStatsRoute
   '/runners/$id': typeof RunnersIdRoute
   '/runners/stats': typeof RunnersStatsRoute
   '/automations': typeof AutomationsIndexRoute
@@ -149,6 +164,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/jobs/$id': typeof JobsIdRoute
+  '/jobs/stats': typeof JobsStatsRoute
   '/runners/$id': typeof RunnersIdRoute
   '/runners/stats': typeof RunnersStatsRoute
   '/automations': typeof AutomationsIndexRoute
@@ -161,6 +177,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/jobs/$id': typeof JobsIdRoute
+  '/jobs/stats': typeof JobsStatsRoute
   '/runners/$id': typeof RunnersIdRoute
   '/runners/stats': typeof RunnersStatsRoute
   '/automations/': typeof AutomationsIndexRoute
@@ -174,6 +191,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/jobs/$id'
+    | '/jobs/stats'
     | '/runners/$id'
     | '/runners/stats'
     | '/automations'
@@ -184,6 +202,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/jobs/$id'
+    | '/jobs/stats'
     | '/runners/$id'
     | '/runners/stats'
     | '/automations'
@@ -194,6 +213,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/jobs/$id'
+    | '/jobs/stats'
     | '/runners/$id'
     | '/runners/stats'
     | '/automations/'
@@ -206,6 +226,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   JobsIdRoute: typeof JobsIdRoute
+  JobsStatsRoute: typeof JobsStatsRoute
   RunnersIdRoute: typeof RunnersIdRoute
   RunnersStatsRoute: typeof RunnersStatsRoute
   AutomationsIndexRoute: typeof AutomationsIndexRoute
@@ -217,6 +238,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   JobsIdRoute: JobsIdRoute,
+  JobsStatsRoute: JobsStatsRoute,
   RunnersIdRoute: RunnersIdRoute,
   RunnersStatsRoute: RunnersStatsRoute,
   AutomationsIndexRoute: AutomationsIndexRoute,
@@ -237,6 +259,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/jobs/$id",
+        "/jobs/stats",
         "/runners/$id",
         "/runners/stats",
         "/automations/",
@@ -250,6 +273,9 @@ export const routeTree = rootRoute
     },
     "/jobs/$id": {
       "filePath": "jobs/$id.tsx"
+    },
+    "/jobs/stats": {
+      "filePath": "jobs/stats.tsx"
     },
     "/runners/$id": {
       "filePath": "runners/$id.tsx"

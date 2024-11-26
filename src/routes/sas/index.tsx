@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
+import { cn, useLocalStorage } from "@/lib/utils";
 import { rankItem } from "@tanstack/match-sorter-utils";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -9,9 +10,10 @@ import {
   type FilterFnOption,
   getCoreRowModel,
   getFilteredRowModel,
+  type Row,
   useReactTable,
 } from "@tanstack/react-table";
-import { GlobeIcon, SearchIcon, XIcon } from "lucide-react";
+import { GlobeIcon, SearchIcon, StarIcon, XIcon } from "lucide-react";
 import { useMemo } from "react";
 
 export const Route = createFileRoute("/sas/")({
@@ -47,6 +49,7 @@ const fuzzyFilter: FilterFn<unknown> = (row, columnId, value, addMeta) => {
 };
 
 function DataTable() {
+  const [favorites, setFavorites] = useLocalStorage<string[]>("favorites", []);
   const { data } = api.useQuery("get", "/sas");
 
   const tableData = useMemo(() => {
@@ -86,34 +89,103 @@ function DataTable() {
           )}
         </div>
       </div>
-      <div className="relative grid grid-cols-3 gap-4">
-        {data ? (
-          table.getRowModel().rows.length > 0 ? (
-            table.getRowModel().rows.map((row, i) => (
-              <Link key={i}>
-                <Card className="h-36 border p-4">
-                  <div className="flex">
-                    <div className="flex aspect-square size-16 items-center justify-center rounded-md border border-blue-6 bg-blue-2 p-3 text-blue-9">
-                      <GlobeIcon className="size-8" />
-                    </div>
-                    <span className="ml-2 font-medium">
-                      {row.getValue("id")}
-                    </span>
-                  </div>
-                </Card>
-              </Link>
-            ))
+
+      {favorites.length > 0 ? (
+        <div className="mb-4 flex flex-col border-b pb-4">
+          <span className="pb-2 text-sm font-medium text-gray-11">
+            Favorites
+          </span>
+          <div className="relative grid grid-cols-3 gap-4">
+            {data
+              ? table.getRowModel().rows.map((row, i) => {
+                  if (favorites.includes(row.getValue("id")))
+                    return (
+                      <SASCard
+                        favorites={favorites}
+                        setFavorites={setFavorites}
+                        row={row}
+                        key={i}
+                      />
+                    );
+                })
+              : Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-36 animate-pulse rounded-lg bg-gray-2"
+                  />
+                ))}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="flex flex-col">
+        <div className="relative grid grid-cols-3 gap-4">
+          {data ? (
+            table.getRowModel().rows.length > 0 ? (
+              table.getRowModel().rows.map((row, i) => {
+                return (
+                  <SASCard
+                    favorites={favorites}
+                    setFavorites={setFavorites}
+                    row={row}
+                    key={i}
+                  />
+                );
+              })
+            ) : (
+              <div className="absolute inset-x-0 flex h-48 flex-col items-center justify-center text-center text-gray-12">
+                No results found
+              </div>
+            )
           ) : (
-            <div className="absolute inset-x-0 flex h-48 flex-col items-center justify-center text-center text-gray-12">
-              No results found
-            </div>
-          )
-        ) : (
-          Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="h-36 animate-pulse rounded-lg bg-gray-2" />
-          ))
-        )}
+            Array.from({ length: 9 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-36 animate-pulse rounded-lg bg-gray-2"
+              />
+            ))
+          )}
+        </div>
       </div>
     </>
+  );
+}
+
+function SASCard({
+  favorites,
+  setFavorites,
+  row,
+}: {
+  favorites: string[];
+  setFavorites: (value: string[]) => void;
+  row: Row<string>;
+}) {
+  const id: string = row.getValue("id");
+  const isFavorite = favorites.includes(id);
+
+  return (
+    <Link>
+      <Card className="h-36 border p-4">
+        <div className="flex">
+          <div className="flex aspect-square size-16 items-center justify-center rounded-md border border-blue-6 bg-blue-2 p-3 text-blue-9">
+            <GlobeIcon className="size-8" />
+          </div>
+          <span className="ml-2 font-medium">{id}</span>
+          <StarIcon
+            onClick={() => {
+              if (!isFavorite) {
+                setFavorites([...favorites, id]);
+              } else {
+                setFavorites(favorites.filter((oldId) => id !== oldId));
+              }
+            }}
+            className={cn(
+              "ml-auto size-4 text-gray-6 hover:text-yellow-9",
+              isFavorite && "fill-yellow-6 text-yellow-9",
+            )}
+          />
+        </div>
+      </Card>
+    </Link>
   );
 }

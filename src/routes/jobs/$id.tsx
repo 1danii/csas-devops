@@ -193,7 +193,7 @@ function RouteComponent() {
                 <JobStateDot state={job.data.state!} />
               </div>
             </div>
-            <div className="ml-48 flex flex-col">
+            <div className="ml-24 flex flex-col">
               <div className="text-xs font-medium text-gray-11">
                 Triggered by
               </div>
@@ -202,7 +202,7 @@ function RouteComponent() {
                 p7v46705x
               </div>
             </div>
-            <div className="ml-48 flex flex-col">
+            <div className="ml-24 flex flex-col">
               <div className="text-xs font-medium text-gray-11">
                 Organization
               </div>
